@@ -66,6 +66,19 @@
       var img = document.createElement('img');
       img.src = imageData.url;
       img.alt = imageData.name || '';
+      
+      // Start with 0 height and transition
+      img.style.opacity = '0';
+      img.style.maxHeight = '0';
+      img.style.transition = 'opacity 0.5s ease, max-height 0.5s ease';
+      
+      img.onload = function() {
+        // Trigger transition after image loads
+        setTimeout(function() {
+          img.style.opacity = '1';
+          img.style.maxHeight = '70vh';
+        }, 50);
+      };
 
       img.onerror = function() {
         tile.classList.add('error');
