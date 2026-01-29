@@ -2,7 +2,7 @@
   "name": "museum",
   "version": "1.0.0",
   "scripts": {
-    "build": "node build.js",
+    "build": "cp ~/Desktop/museum/* ./public/images/ 2>/dev/null; node build.js",
     "start": "node server.js"
   },
   "dependencies": {
