@@ -2,7 +2,7 @@
   "name": "museum",
   "version": "1.0.0",
   "scripts": {
-    "build": "cp ~/Desktop/museum/* ./public/images/ 2>/dev/null; node build.js",
+    "build": "rm -rf ./public/images/* && cp ~/Desktop/museum/* ./public/images/ 2>/dev/null; touch ./public/images/.gitkeep; node build.js",
     "start": "node server.js"
   },
   "dependencies": {
