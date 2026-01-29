@@ -39,29 +39,28 @@
       
       document.body.removeChild(testDiv);
       
-      // Create SVG for each line
-      lines.forEach(function(line) {
-        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('viewBox', '0 0 100 12');
-        svg.setAttribute('preserveAspectRatio', 'none');
-        svg.style.width = '100%';
-        svg.style.height = 'auto';
-        svg.style.display = 'block';
-        
-        var textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        textEl.setAttribute('x', '0');
-        textEl.setAttribute('y', '10');
-        textEl.setAttribute('font-family', 'Arial Black, Arial, sans-serif');
-        textEl.setAttribute('font-weight', '900');
-        textEl.setAttribute('font-size', '12');
-        textEl.setAttribute('fill', '#000');
-        textEl.setAttribute('textLength', '100');
-        textEl.setAttribute('lengthAdjust', 'spacingAndGlyphs');
-        textEl.textContent = line;
-        
-        svg.appendChild(textEl);
-        fortuneDiv.appendChild(svg);
-      });
+      // Create SVG for only the final line
+      var lastLine = lines[lines.length - 1];
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 100 12');
+      svg.setAttribute('preserveAspectRatio', 'none');
+      svg.style.width = '100%';
+      svg.style.height = 'auto';
+      svg.style.display = 'block';
+      
+      var textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      textEl.setAttribute('x', '0');
+      textEl.setAttribute('y', '10');
+      textEl.setAttribute('font-family', 'Arial Black, Arial, sans-serif');
+      textEl.setAttribute('font-weight', '900');
+      textEl.setAttribute('font-size', '12');
+      textEl.setAttribute('fill', '#000');
+      textEl.setAttribute('textLength', '100');
+      textEl.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+      textEl.textContent = lastLine;
+      
+      svg.appendChild(textEl);
+      fortuneDiv.appendChild(svg);
     });
 
   var gallery = document.getElementById('gallery');
