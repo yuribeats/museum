@@ -1,20 +1,6 @@
 (function() {
   'use strict';
 
-  function updateBtcPrice() {
-    fetch('https://api.coindesk.com/v1/bpi/currentprice/USD.json')
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        var price = Math.round(data.bpi.USD.rate_float).toLocaleString();
-        document.getElementById('btc-text').textContent = 'BTC: $' + price;
-      })
-      .catch(function() {
-        document.getElementById('btc-text').textContent = 'BTC: ---';
-      });
-  }
-  updateBtcPrice();
-  setInterval(updateBtcPrice, 60000);
-
   fetch('/fortunes.txt')
     .then(function(res) { return res.text(); })
     .then(function(text) {
@@ -23,19 +9,19 @@
       var fortuneDiv = document.getElementById('fortune');
       
       var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('viewBox', '0 0 100 20');
+      svg.setAttribute('viewBox', '0 0 100 22');
       svg.setAttribute('preserveAspectRatio', 'none');
       
       var textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       textEl.setAttribute('x', '0');
-      textEl.setAttribute('y', '16');
+      textEl.setAttribute('y', '19');
       textEl.setAttribute('font-family', 'Arial Black, Arial, sans-serif');
       textEl.setAttribute('font-weight', '900');
-      textEl.setAttribute('font-size', '14');
+      textEl.setAttribute('font-size', '22');
       textEl.setAttribute('fill', '#000');
       textEl.setAttribute('textLength', '100');
       textEl.setAttribute('lengthAdjust', 'spacingAndGlyphs');
-      textEl.textContent = fortune.replace(/\n/g, ' ').replace(/\s+/g, ' ');
+      textEl.textContent = fortune.replace(/\n/g, ' ').replace(/\s+/g, ' ').toUpperCase();
       
       svg.appendChild(textEl);
       fortuneDiv.appendChild(svg);

@@ -108,3 +108,14 @@ main {
   height: auto;
   display: block;
 }
+
+#fortune {
+  width: 100%;
+  margin-top: clamp(16px, 3vw, 32px);
+}
+
+#fortune svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
