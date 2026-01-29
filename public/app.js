@@ -17,7 +17,7 @@
       var currentLine = '';
       
       var testDiv = document.createElement('div');
-      testDiv.style.cssText = 'position:absolute;visibility:hidden;font-family:Arial Black,Arial,sans-serif;font-weight:900;font-size:24px;white-space:nowrap;';
+      testDiv.style.cssText = 'position:absolute;visibility:hidden;font-family:Arial Black,Arial,sans-serif;font-weight:900;font-size:18px;white-space:nowrap;';
       document.body.appendChild(testDiv);
       
       var maxWidth = fortuneDiv.offsetWidth;
