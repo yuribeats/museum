@@ -143,9 +143,21 @@
       var destX = (size - sourceWidth) / 2;
       var destY = (size - sourceHeight) / 2;
       ctx.drawImage(canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, sourceWidth, sourceHeight);
+      var dataUrl = squareCanvas.toDataURL();
+      
+      fetch('/api/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: dataUrl })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        console.log('Saved to gallery:', data.url);
+      }).catch(function(err) {
+        console.error('Failed to save to gallery', err);
+      });
+      
       var link = document.createElement('a');
       link.download = 'public-' + Date.now() + '.png';
-      link.href = squareCanvas.toDataURL();
+      link.href = dataUrl;
       link.click();
     });
   }
