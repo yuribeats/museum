@@ -69,6 +69,11 @@ main {
   visibility: hidden;
 }
 
+.fortune {
+  width: 100%;
+  padding-top: clamp(16px, 3vw, 32px);
+}
+
 #sentinel {
   height: 1px;
   width: 100%;
