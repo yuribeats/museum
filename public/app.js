@@ -6,6 +6,18 @@
   script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
   document.head.appendChild(script);
 
+  // Fade in header
+  var header = document.querySelector('header');
+  var headerSvg = header.querySelector('svg');
+  headerSvg.style.opacity = '0';
+  headerSvg.style.transform = 'translateY(-8px)';
+  headerSvg.style.transition = 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+  
+  setTimeout(function() {
+    headerSvg.style.opacity = '1';
+    headerSvg.style.transform = 'translateY(0)';
+  }, 100);
+
   fetch('/fortunes.txt')
     .then(function(res) { return res.text(); })
     .then(function(text) {
@@ -62,7 +74,6 @@
     });
 
   var gallery = document.getElementById('gallery');
-  var header = document.querySelector('header');
 
   // Screenshot function
   function takeScreenshot() {
@@ -180,6 +191,10 @@
           fortuneSvg.style.transform = 'translateY(8px)';
           fortuneSvg.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
         }
+        
+        headerSvg.style.opacity = '0';
+        headerSvg.style.transform = 'translateY(-8px)';
+        headerSvg.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
         
         setTimeout(function() {
           location.reload();
