@@ -8,13 +8,14 @@
   <style>
     #gallery-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      grid-template-columns: repeat(auto-fill, 100px);
       gap: 8px;
       margin-top: 15px;
+      justify-content: center;
     }
     #gallery-grid img {
-      width: 100%;
-      aspect-ratio: 1;
+      width: 100px;
+      height: 100px;
       object-fit: cover;
       display: block;
       cursor: pointer;
