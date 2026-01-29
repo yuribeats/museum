@@ -92,10 +92,17 @@ main {
   margin-top: clamp(16px, 3vw, 32px);
   font-family: "Arial Black", Arial, sans-serif;
   font-weight: 900;
-  font-size: clamp(18px, 4vw, 32px);
-  line-height: 1.1;
+  font-size: clamp(14px, 3vw, 24px);
+  line-height: 1.2;
   text-transform: uppercase;
   color: #000;
+  text-align: justify;
+  text-align-last: left;
+}
+
+#fortune span {
+  display: block;
+  width: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
