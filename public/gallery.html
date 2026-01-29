@@ -8,38 +8,41 @@
   <style>
     #gallery-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, 100px);
+      grid-template-columns: repeat(auto-fill, 150px);
       gap: 8px;
       margin-top: 15px;
       justify-content: center;
     }
     .thumb {
-      width: 100px;
-      height: 100px;
+      width: 150px;
+      height: 150px;
       overflow: hidden;
       cursor: pointer;
       opacity: 0;
       transform: scale(0.96);
       transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       background: #f0f0f0;
+      position: relative;
     }
     .thumb.loaded {
       opacity: 1;
       transform: scale(1);
     }
     .thumb:hover {
-      transform: scale(1.15);
+      transform: scale(1.1);
       z-index: 10;
-      position: relative;
     }
     .thumb.loaded:hover {
-      transform: scale(1.15);
+      transform: scale(1.1);
     }
     .thumb img {
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 150px;
+      height: 150px;
       object-fit: cover;
-      display: block;
+      object-position: center;
     }
     #lightbox {
       display: none;
