@@ -1,6 +1,6 @@
 const https=require('https'),fs=require('fs'),path=require('path');
 const API_KEY=process.env.FLICKR_KEY,DEST=path.join(process.env.HOME,'Desktop','museum');
-const KW=['jasper johns art','robert rauschenberg art','nam june paik','laurie anderson artist','elvis costello','michael mann director','canal street nyc','avenue a nyc','pyramid club nyc','tompkins square park'];
+const KW=['ramelzee','black and white mf doom','blunted in the bomb shelter','compilation album cover','topicalia 68','african futurism','neptune frost','fellinis women','mecha gojira'];
 if(!API_KEY){console.error('Missing FLICKR_KEY');process.exit(1);}
 if(!fs.existsSync(DEST))fs.mkdirSync(DEST,{recursive:true});
 function get(u){return new Promise((r,j)=>{https.get(u,s=>{let d='';s.on('data',c=>d+=c);s.on('end',()=>r(JSON.parse(d)));}).on('error',j);});}
