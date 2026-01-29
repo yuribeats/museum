@@ -60,17 +60,22 @@
     .then(function(res) { return res.json(); })
     .then(function(data) {
       allImages = data.images || [];
-      renderBatch();
+      if (allImages.length > 0) {
+        loading = false;
+        renderBatch();
+      }
     })
     .catch(function(err) {
       console.error('Failed to load images:', err);
     });
 
-  var observer = new IntersectionObserver(function(entries) {
-    if (entries[0].isIntersecting && !loading && !allLoaded) {
-      renderBatch();
-    }
-  }, { rootMargin: '400px' });
+  if (sentinel) {
+    var observer = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting && !loading && !allLoaded && allImages.length > 0) {
+        renderBatch();
+      }
+    }, { rootMargin: '400px' });
 
-  observer.observe(sentinel);
+    observer.observe(sentinel);
+  }
 })();
