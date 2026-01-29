@@ -13,6 +13,9 @@
   // Setup header fade
   var header = document.querySelector('header');
   var headerSvg = header.querySelector('svg');
+  var headerText = headerSvg.querySelector('text');
+  headerText.setAttribute('stroke', '#000');
+  headerText.setAttribute('stroke-width', '0.5');
   headerSvg.style.opacity = '0';
   headerSvg.style.transform = 'translateY(-8px)';
   headerSvg.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
@@ -109,6 +112,8 @@
       textEl.setAttribute('font-weight', '900');
       textEl.setAttribute('font-size', '22');
       textEl.setAttribute('fill', '#000');
+      textEl.setAttribute('stroke', '#000');
+      textEl.setAttribute('stroke-width', '0.5');
       textEl.setAttribute('textLength', '100');
       textEl.setAttribute('lengthAdjust', 'spacingAndGlyphs');
       textEl.textContent = lastLine;
