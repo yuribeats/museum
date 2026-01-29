@@ -99,6 +99,10 @@
       }, 300);
     };
     
+    function toFastGateway(url) {
+      return url.replace('gateway.pinata.cloud/ipfs/', 'amethyst-abstract-firefly-614.mypinata.cloud/ipfs/');
+    }
+    
     fetch('https://api.museum.ink/api/gallery')
       .then(function(res) { return res.json(); })
       .then(function(data) {
@@ -111,13 +115,14 @@
         }
         data.images.forEach(function(image) {
           var img = document.createElement('img');
-          img.src = image.url;
+          var url = toFastGateway(image.url);
+          img.src = url;
           img.alt = image.name;
           img.onload = function() {
             img.classList.add('loaded');
           };
           img.onclick = function() {
-            lightboxImg.src = image.url;
+            lightboxImg.src = url;
             lightbox.classList.add('active');
             setTimeout(function() {
               lightboxImg.classList.add('show');
