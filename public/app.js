@@ -27,10 +27,10 @@
         lines.push(line);
       }
       
-      // Create SVG for only the final line
+      // Create SVG for only the final line - match header dimensions
       var lastLine = lines[lines.length - 1];
       var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('viewBox', '0 0 100 12');
+      svg.setAttribute('viewBox', '0 0 100 22');
       svg.setAttribute('preserveAspectRatio', 'none');
       svg.style.width = '100%';
       svg.style.height = 'auto';
@@ -38,10 +38,10 @@
       
       var textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       textEl.setAttribute('x', '0');
-      textEl.setAttribute('y', '10');
+      textEl.setAttribute('y', '19');
       textEl.setAttribute('font-family', 'Arial Black, Arial, sans-serif');
       textEl.setAttribute('font-weight', '900');
-      textEl.setAttribute('font-size', '12');
+      textEl.setAttribute('font-size', '22');
       textEl.setAttribute('fill', '#000');
       textEl.setAttribute('textLength', '100');
       textEl.setAttribute('lengthAdjust', 'spacingAndGlyphs');
