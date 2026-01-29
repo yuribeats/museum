@@ -6,17 +6,43 @@
   script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
   document.head.appendChild(script);
 
-  // Fade in header
+  // Setup header fade
   var header = document.querySelector('header');
   var headerSvg = header.querySelector('svg');
   headerSvg.style.opacity = '0';
   headerSvg.style.transform = 'translateY(-8px)';
-  headerSvg.style.transition = 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
-  
-  setTimeout(function() {
+  headerSvg.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
+
+  var fortuneSvg = null;
+  var img = null;
+
+  function fadeInAll() {
     headerSvg.style.opacity = '1';
     headerSvg.style.transform = 'translateY(0)';
-  }, 100);
+    
+    if (fortuneSvg) {
+      fortuneSvg.style.opacity = '1';
+      fortuneSvg.style.transform = 'translateY(0)';
+    }
+    
+    if (img) {
+      img.style.opacity = '1';
+      img.style.transform = 'scale(1)';
+    }
+  }
+
+  var imageLoaded = false;
+  var fortuneLoaded = false;
+
+  function checkAllLoaded() {
+    if (imageLoaded && fortuneLoaded) {
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          fadeInAll();
+        });
+      });
+    }
+  }
 
   fetch('/fortunes.txt')
     .then(function(res) { return res.text(); })
@@ -43,15 +69,15 @@
       }
       
       var lastLine = lines[lines.length - 1];
-      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('viewBox', '0 0 100 22');
-      svg.setAttribute('preserveAspectRatio', 'none');
-      svg.style.width = '100%';
-      svg.style.height = 'auto';
-      svg.style.display = 'block';
-      svg.style.opacity = '0';
-      svg.style.transform = 'translateY(8px)';
-      svg.style.transition = 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+      fortuneSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      fortuneSvg.setAttribute('viewBox', '0 0 100 22');
+      fortuneSvg.setAttribute('preserveAspectRatio', 'none');
+      fortuneSvg.style.width = '100%';
+      fortuneSvg.style.height = 'auto';
+      fortuneSvg.style.display = 'block';
+      fortuneSvg.style.opacity = '0';
+      fortuneSvg.style.transform = 'translateY(8px)';
+      fortuneSvg.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
       
       var textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       textEl.setAttribute('x', '0');
@@ -64,13 +90,11 @@
       textEl.setAttribute('lengthAdjust', 'spacingAndGlyphs');
       textEl.textContent = lastLine;
       
-      svg.appendChild(textEl);
-      fortuneDiv.appendChild(svg);
+      fortuneSvg.appendChild(textEl);
+      fortuneDiv.appendChild(fortuneSvg);
       
-      setTimeout(function() {
-        svg.style.opacity = '1';
-        svg.style.transform = 'translateY(0)';
-      }, 400);
+      fortuneLoaded = true;
+      checkAllLoaded();
     });
 
   var gallery = document.getElementById('gallery');
@@ -94,37 +118,30 @@
       }, 100);
     });
     
-    // Capture the main content area
     var main = document.querySelector('main');
     
     html2canvas(document.body, {
       backgroundColor: '#ffffff',
       scale: 2
     }).then(function(canvas) {
-      // Get content dimensions
       var headerEl = document.querySelector('header');
       var fortuneEl = document.getElementById('fortune');
-      var galleryEl = document.getElementById('gallery');
       
-      // Calculate content bounds
       var contentTop = headerEl.offsetTop;
       var contentBottom = fortuneEl.offsetTop + fortuneEl.offsetHeight;
       var contentHeight = contentBottom - contentTop;
       var contentWidth = main.offsetWidth;
       
-      // Use the larger dimension for square
-      var size = Math.max(contentWidth, contentHeight) * 2; // scale factor
+      var size = Math.max(contentWidth, contentHeight) * 2;
       
       var squareCanvas = document.createElement('canvas');
       squareCanvas.width = size;
       squareCanvas.height = size;
       var ctx = squareCanvas.getContext('2d');
       
-      // Fill white background
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, size, size);
       
-      // Calculate centering offsets
       var sourceWidth = contentWidth * 2;
       var sourceHeight = contentHeight * 2;
       var sourceX = (canvas.width - sourceWidth) / 2;
@@ -133,7 +150,6 @@
       var destX = (size - sourceWidth) / 2;
       var destY = (size - sourceHeight) / 2;
       
-      // Draw centered content
       ctx.drawImage(canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, sourceWidth, sourceHeight);
       
       var link = document.createElement('a');
@@ -143,7 +159,6 @@
     });
   }
 
-  // Click header to screenshot
   header.style.cursor = 'pointer';
   header.onclick = takeScreenshot;
 
@@ -161,7 +176,7 @@
       tile.style.cursor = 'pointer';
       tile.style.overflow = 'hidden';
       
-      var img = document.createElement('img');
+      img = document.createElement('img');
       img.src = imageData.url;
       img.alt = imageData.name || '';
       
@@ -171,21 +186,15 @@
       img.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
       
       img.onload = function() {
-        requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
-            img.style.opacity = '1';
-            img.style.transform = 'scale(1)';
-          });
-        });
+        imageLoaded = true;
+        checkAllLoaded();
       };
       
-      // Click image: scale down, fade out, then reload
       tile.onclick = function() {
         img.style.opacity = '0';
         img.style.transform = 'scale(0.98)';
         img.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
         
-        var fortuneSvg = document.querySelector('#fortune svg');
         if (fortuneSvg) {
           fortuneSvg.style.opacity = '0';
           fortuneSvg.style.transform = 'translateY(8px)';
