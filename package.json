@@ -4,7 +4,7 @@
   "scripts": {
     "build": "rm -rf ./public/images/* && cp ~/Desktop/museum/* ./public/images/ 2>/dev/null; touch ./public/images/.gitkeep; node build.js",
     "start": "node server.js",
-    "deploy": "npm run build && git add . && git diff --staged --quiet || git commit -m 'sync' && git push && vercel --prod --force"
+    "deploy": "npm run build && git add . && git diff --staged --quiet || git commit -m 'sync' && git push && vercel --prod --force --no-wait"
   },
   "dependencies": {
     "express": "^4.21.0"
