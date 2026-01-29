@@ -1,6 +1,11 @@
 (function() {
   'use strict';
 
+  // Load html2canvas
+  var script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  document.head.appendChild(script);
+
   fetch('/fortunes.txt')
     .then(function(res) { return res.text(); })
     .then(function(text) {
@@ -56,6 +61,41 @@
     });
 
   var gallery = document.getElementById('gallery');
+  var header = document.querySelector('header');
+
+  // Screenshot function
+  function takeScreenshot() {
+    if (typeof html2canvas === 'undefined') return;
+    
+    // Flash effect
+    var flash = document.createElement('div');
+    flash.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;opacity:0;z-index:9999;pointer-events:none;transition:opacity 0.1s';
+    document.body.appendChild(flash);
+    
+    requestAnimationFrame(function() {
+      flash.style.opacity = '1';
+      setTimeout(function() {
+        flash.style.opacity = '0';
+        setTimeout(function() {
+          flash.remove();
+        }, 100);
+      }, 100);
+    });
+    
+    html2canvas(document.body, {
+      backgroundColor: '#ffffff',
+      scale: 2
+    }).then(function(canvas) {
+      var link = document.createElement('a');
+      link.download = 'public-' + Date.now() + '.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  }
+
+  // Click header to screenshot
+  header.style.cursor = 'pointer';
+  header.onclick = takeScreenshot;
 
   fetch('/images.json')
     .then(function(res) { return res.json(); })
@@ -75,7 +115,6 @@
       img.src = imageData.url;
       img.alt = imageData.name || '';
       
-      // Emil style: scale + fade + spring easing
       img.style.opacity = '0';
       img.style.transform = 'scale(0.96)';
       img.style.transformOrigin = 'center center';
@@ -90,7 +129,7 @@
         });
       };
       
-      // Click: scale down, fade out, then reload
+      // Click image: scale down, fade out, then reload
       tile.onclick = function() {
         img.style.opacity = '0';
         img.style.transform = 'scale(0.98)';
