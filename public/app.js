@@ -83,20 +83,47 @@
       }, 100);
     });
     
+    // Capture the main content area
+    var main = document.querySelector('main');
+    
     html2canvas(document.body, {
       backgroundColor: '#ffffff',
       scale: 2
     }).then(function(canvas) {
-      // Create square canvas by cropping width
-      var size = Math.min(canvas.width, canvas.height);
+      // Get content dimensions
+      var headerEl = document.querySelector('header');
+      var fortuneEl = document.getElementById('fortune');
+      var galleryEl = document.getElementById('gallery');
+      
+      // Calculate content bounds
+      var contentTop = headerEl.offsetTop;
+      var contentBottom = fortuneEl.offsetTop + fortuneEl.offsetHeight;
+      var contentHeight = contentBottom - contentTop;
+      var contentWidth = main.offsetWidth;
+      
+      // Use the larger dimension for square
+      var size = Math.max(contentWidth, contentHeight) * 2; // scale factor
+      
       var squareCanvas = document.createElement('canvas');
       squareCanvas.width = size;
       squareCanvas.height = size;
       var ctx = squareCanvas.getContext('2d');
       
-      // Center crop horizontally
-      var offsetX = (canvas.width - size) / 2;
-      ctx.drawImage(canvas, offsetX, 0, size, size, 0, 0, size, size);
+      // Fill white background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+      
+      // Calculate centering offsets
+      var sourceWidth = contentWidth * 2;
+      var sourceHeight = contentHeight * 2;
+      var sourceX = (canvas.width - sourceWidth) / 2;
+      var sourceY = contentTop * 2;
+      
+      var destX = (size - sourceWidth) / 2;
+      var destY = (size - sourceHeight) / 2;
+      
+      // Draw centered content
+      ctx.drawImage(canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, sourceWidth, sourceHeight);
       
       var link = document.createElement('a');
       link.download = 'public-' + Date.now() + '.png';
