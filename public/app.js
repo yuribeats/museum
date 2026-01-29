@@ -9,7 +9,7 @@
       
       fortune = fortune.split('―')[0].split('—')[0].split('--')[0].trim();
       
-      fortune = fortune.replace(/"/g, ' ').replace(/"/g, ' ').replace(/"/g, ' ').replace(/\./g, '').replace(/\]/g, '').replace(/\)/g, '');
+      fortune = fortune.replace(/"/g, ' ').replace(/"/g, ' ').replace(/"/g, ' ').replace(/\./g, '').replace(/\]/g, '').replace(/\)/g, '').replace(/\[/g, '').replace(/\(/g, '');
       
       var fortuneText = fortune.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase();
       
