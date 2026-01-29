@@ -20,27 +20,12 @@
       
       var words = fortuneText.split(' ');
       var lines = [];
-      var currentLine = '';
       
-      var testDiv = document.createElement('div');
-      testDiv.style.cssText = 'position:absolute;visibility:hidden;font-family:Arial Black,Arial,sans-serif;font-weight:900;font-size:18px;white-space:nowrap;';
-      document.body.appendChild(testDiv);
-      
-      var maxWidth = fortuneDiv.offsetWidth;
-      
-      words.forEach(function(word) {
-        var testLine = currentLine ? currentLine + ' ' + word : word;
-        testDiv.textContent = testLine;
-        if (testDiv.offsetWidth > maxWidth && currentLine) {
-          lines.push(currentLine);
-          currentLine = word;
-        } else {
-          currentLine = testLine;
-        }
-      });
-      if (currentLine) lines.push(currentLine);
-      
-      document.body.removeChild(testDiv);
+      // Max 5 words per line
+      for (var i = 0; i < words.length; i += 5) {
+        var line = words.slice(i, i + 5).join(' ');
+        lines.push(line);
+      }
       
       // Create SVG for only the final line
       var lastLine = lines[lines.length - 1];
