@@ -10,12 +10,6 @@
       // Remove emdash and everything after it
       fortune = fortune.split('―')[0].split('—')[0].split('--')[0].trim();
       
-      // Remove anything after a period (keep the period)
-      var periodIndex = fortune.indexOf('.');
-      if (periodIndex !== -1) {
-        fortune = fortune.substring(0, periodIndex + 1);
-      }
-      
       var fortuneText = fortune.replace(/\n/g, ' ').replace(/\s+/g, ' ').toUpperCase();
       
       var fortuneDiv = document.getElementById('fortune');
