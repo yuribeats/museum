@@ -7,11 +7,9 @@
       var fortunes = text.split('%').map(function(f) { return f.trim(); }).filter(Boolean);
       var fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
       
-      // Remove emdash and everything after it
       fortune = fortune.split('―')[0].split('—')[0].split('--')[0].trim();
       
-      // Replace quotes with space, remove periods and brackets
-      fortune = fortune.replace(/"/g, ' ').replace(/"/g, ' ').replace(/"/g, ' ').replace(/\./g, '').replace(/\]/g, '');
+      fortune = fortune.replace(/"/g, ' ').replace(/"/g, ' ').replace(/"/g, ' ').replace(/\./g, '').replace(/\]/g, '').replace(/\)/g, '');
       
       var fortuneText = fortune.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase();
       
@@ -21,13 +19,11 @@
       var words = fortuneText.split(' ');
       var lines = [];
       
-      // Max 5 words per line
       for (var i = 0; i < words.length; i += 5) {
         var line = words.slice(i, i + 5).join(' ');
         lines.push(line);
       }
       
-      // Create SVG for only the final line - match header dimensions
       var lastLine = lines[lines.length - 1];
       var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('viewBox', '0 0 100 22');
