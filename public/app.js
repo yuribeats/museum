@@ -5,100 +5,72 @@
   var offset = 0;
   var loading = false;
   var allLoaded = false;
-  var retryCount = 0;
-  var MAX_RETRIES = 3;
+  var allImages = [];
 
   var gallery = document.getElementById('gallery');
   var loader = document.getElementById('loader');
   var sentinel = document.getElementById('sentinel');
 
-  if (!gallery || !loader || !sentinel) {
-    console.error('Museum: Required elements not found');
-    return;
-  }
-
-  function loadImages() {
+  function renderBatch() {
     if (loading || allLoaded) return;
-
     loading = true;
     loader.classList.remove('hidden');
 
-    var url = '/api/images?offset=' + offset + '&limit=' + LIMIT;
+    var batch = allImages.slice(offset, offset + LIMIT);
+    
+    if (batch.length === 0) {
+      allLoaded = true;
+      loader.classList.add('hidden');
+      loading = false;
+      return;
+    }
 
-    fetch(url)
-      .then(function(response) {
-        if (!response.ok) {
-          throw new Error('HTTP ' + response.status);
-        }
-        return response.json();
-      })
-      .then(function(data) {
-        retryCount = 0;
+    var fragment = document.createDocumentFragment();
 
-        if (!data.images || data.images.length === 0) {
-          allLoaded = true;
-          loader.classList.add('hidden');
-          return;
-        }
+    batch.forEach(function(imageData) {
+      var tile = document.createElement('div');
+      tile.className = 'tile';
 
-        var fragment = document.createDocumentFragment();
+      var img = document.createElement('img');
+      img.src = imageData.url;
+      img.alt = imageData.name || '';
+      img.loading = 'lazy';
+      img.decoding = 'async';
 
-        data.images.forEach(function(imageData) {
-          var tile = document.createElement('div');
-          tile.className = 'tile';
+      img.onerror = function() {
+        tile.classList.add('error');
+      };
 
-          var img = document.createElement('img');
-          img.src = imageData.url;
-          img.alt = imageData.name || '';
-          img.loading = 'lazy';
-          img.decoding = 'async';
+      tile.appendChild(img);
+      fragment.appendChild(tile);
+    });
 
-          img.onerror = function() {
-            tile.classList.add('error');
-          };
+    gallery.appendChild(fragment);
+    offset += batch.length;
 
-          tile.appendChild(img);
-          fragment.appendChild(tile);
-        });
+    if (offset >= allImages.length) {
+      allLoaded = true;
+    }
 
-        gallery.appendChild(fragment);
-        offset += data.images.length;
-
-        if (offset >= data.total) {
-          allLoaded = true;
-        }
-      })
-      .catch(function(error) {
-        console.error('Museum: Failed to load images:', error.message);
-        retryCount++;
-
-        if (retryCount < MAX_RETRIES) {
-          setTimeout(function() {
-            loading = false;
-            loadImages();
-          }, 1000 * retryCount);
-          return;
-        }
-      })
-      .finally(function() {
-        loading = false;
-        loader.classList.add('hidden');
-      });
+    loading = false;
+    loader.classList.add('hidden');
   }
 
-  var observer = new IntersectionObserver(
-    function(entries) {
-      if (entries[0].isIntersecting && !loading && !allLoaded) {
-        loadImages();
-      }
-    },
-    {
-      rootMargin: '400px',
-      threshold: 0
+  fetch('/images.json')
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      allImages = data.images || [];
+      renderBatch();
+    })
+    .catch(function(err) {
+      console.error('Failed to load images:', err);
+    });
+
+  var observer = new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting && !loading && !allLoaded) {
+      renderBatch();
     }
-  );
+  }, { rootMargin: '400px' });
 
   observer.observe(sentinel);
-
-  loadImages();
 })();
