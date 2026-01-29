@@ -39,19 +39,19 @@
     <div id="gallery-grid"></div>
   </main>
   <script>
-    fetch('/api/gallery')
+    fetch('https://api.museum.ink/api/gallery')
       .then(function(res) { return res.json(); })
       .then(function(data) {
         var grid = document.getElementById('gallery-grid');
         data.images.forEach(function(image) {
           var img = document.createElement('img');
-          img.src = image.url;
+          img.src = 'https://api.museum.ink' + image.url;
           img.alt = image.name;
           img.onload = function() {
             img.classList.add('loaded');
           };
           img.onclick = function() {
-            window.open(image.url, '_blank');
+            window.open('https://api.museum.ink' + image.url, '_blank');
           };
           grid.appendChild(img);
         });
