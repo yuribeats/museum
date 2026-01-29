@@ -10,6 +10,9 @@
       // Remove emdash and everything after it
       fortune = fortune.split('―')[0].split('—')[0].split('--')[0].trim();
       
+      // Remove quotes
+      fortune = fortune.replace(/"/g, '').replace(/"/g, '').replace(/"/g, '');
+      
       var fortuneText = fortune.replace(/\n/g, ' ').replace(/\s+/g, ' ').toUpperCase();
       
       var fortuneDiv = document.getElementById('fortune');
