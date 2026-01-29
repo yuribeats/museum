@@ -31,6 +31,9 @@
       svg.style.width = '100%';
       svg.style.height = 'auto';
       svg.style.display = 'block';
+      svg.style.opacity = '0';
+      svg.style.transform = 'translateY(8px)';
+      svg.style.transition = 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
       
       var textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       textEl.setAttribute('x', '0');
@@ -45,6 +48,11 @@
       
       svg.appendChild(textEl);
       fortuneDiv.appendChild(svg);
+      
+      setTimeout(function() {
+        svg.style.opacity = '1';
+        svg.style.transform = 'translateY(0)';
+      }, 400);
     });
 
   var gallery = document.getElementById('gallery');
@@ -61,23 +69,43 @@
       var tile = document.createElement('div');
       tile.className = 'tile';
       tile.style.cursor = 'pointer';
-      tile.onclick = function() { location.reload(); };
-
+      tile.style.overflow = 'hidden';
+      
       var img = document.createElement('img');
       img.src = imageData.url;
       img.alt = imageData.name || '';
       
-      // Start with 0 height and transition
+      // Emil style: scale + fade + spring easing
       img.style.opacity = '0';
-      img.style.maxHeight = '0';
-      img.style.transition = 'opacity 0.5s ease, max-height 0.5s ease';
+      img.style.transform = 'scale(0.96)';
+      img.style.transformOrigin = 'center center';
+      img.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
       
       img.onload = function() {
-        // Trigger transition after image loads
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            img.style.opacity = '1';
+            img.style.transform = 'scale(1)';
+          });
+        });
+      };
+      
+      // Click: scale down, fade out, then reload
+      tile.onclick = function() {
+        img.style.opacity = '0';
+        img.style.transform = 'scale(0.98)';
+        img.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+        
+        var fortuneSvg = document.querySelector('#fortune svg');
+        if (fortuneSvg) {
+          fortuneSvg.style.opacity = '0';
+          fortuneSvg.style.transform = 'translateY(8px)';
+          fortuneSvg.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+        }
+        
         setTimeout(function() {
-          img.style.opacity = '1';
-          img.style.maxHeight = '70vh';
-        }, 50);
+          location.reload();
+        }, 300);
       };
 
       img.onerror = function() {
