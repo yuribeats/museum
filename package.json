@@ -1,0 +1,16 @@
+{
+  "name": "museum",
+  "version": "1.0.0",
+  "description": "Minimal image gallery with infinite scroll",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "import": "node import.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
