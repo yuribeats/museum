@@ -8,12 +8,10 @@ const IMAGES_DIR = path.join(__dirname, 'public', 'images');
 const GALLERY_DIR = path.join(__dirname, 'public', 'gallery-images');
 const ALLOWED_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
 
-// Ensure gallery directory exists
 if (!fs.existsSync(GALLERY_DIR)) {
   fs.mkdirSync(GALLERY_DIR, { recursive: true });
 }
 
-// In-memory cache
 let cache = {
   images: [],
   timestamp: 0
@@ -22,7 +20,17 @@ const CACHE_TTL = 2000;
 
 app.disable('x-powered-by');
 
-// Parse JSON and base64 bodies
+// CORS middleware
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 
 function isValidFilename(filename) {
@@ -35,11 +43,9 @@ function isValidFilename(filename) {
 
 function getImageList() {
   const now = Date.now();
-
   if (cache.images.length > 0 && (now - cache.timestamp) < CACHE_TTL) {
     return cache.images;
   }
-
   if (!fs.existsSync(IMAGES_DIR)) {
     try {
       fs.mkdirSync(IMAGES_DIR, { recursive: true });
@@ -50,21 +56,15 @@ function getImageList() {
     cache.timestamp = now;
     return [];
   }
-
   let files = [];
-
   try {
     const dirEntries = fs.readdirSync(IMAGES_DIR);
-
     for (const file of dirEntries) {
       if (!isValidFilename(file)) continue;
-
       const ext = path.extname(file).toLowerCase();
       if (!ALLOWED_EXTENSIONS.has(ext)) continue;
-
       const filePath = path.join(IMAGES_DIR, file);
       let mtime = null;
-
       try {
         const stats = fs.statSync(filePath);
         if (!stats.isFile()) continue;
@@ -72,14 +72,12 @@ function getImageList() {
       } catch (e) {
         continue;
       }
-
       files.push({
         name: file,
         url: `/images/${encodeURIComponent(file)}`,
         mtime: mtime
       });
     }
-
     files.sort((a, b) => {
       if (a.mtime !== null && b.mtime !== null) {
         return b.mtime - a.mtime;
@@ -88,21 +86,17 @@ function getImageList() {
       if (b.mtime !== null) return 1;
       return a.name.localeCompare(b.name);
     });
-
   } catch (e) {
     console.error('Error reading images directory:', e.message);
     files = [];
   }
-
   cache.images = files;
   cache.timestamp = now;
-
   return files;
 }
 
 function getGalleryImages() {
   if (!fs.existsSync(GALLERY_DIR)) return [];
-  
   let files = [];
   try {
     const dirEntries = fs.readdirSync(GALLERY_DIR);
@@ -147,11 +141,9 @@ app.use(express.static('public', {
 app.get('/api/images', (req, res) => {
   const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
-
   const allImages = getImageList();
   const total = allImages.length;
   const paginatedImages = allImages.slice(offset, offset + limit);
-
   res.set('Cache-Control', 'public, max-age=2');
   res.json({
     images: paginatedImages,
@@ -171,13 +163,11 @@ app.post('/api/gallery', (req, res) => {
     if (!image || !image.startsWith('data:image/png;base64,')) {
       return res.status(400).json({ error: 'Invalid image data' });
     }
-    
     const base64Data = image.replace(/^data:image\/png;base64,/, '');
     const filename = 'public-' + Date.now() + '.png';
     const filepath = path.join(GALLERY_DIR, filename);
-    
     fs.writeFileSync(filepath, base64Data, 'base64');
-    
+    console.log('Saved gallery image:', filename);
     res.json({ 
       success: true, 
       url: '/gallery-images/' + filename 
@@ -202,7 +192,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Museum server running on port ${PORT}`);
-  console.log(`Images directory: ${IMAGES_DIR}`);
-  console.log(`Gallery directory: ${GALLERY_DIR}`);
+  console.log('Museum server running on port ' + PORT);
+  console.log('Images directory: ' + IMAGES_DIR);
+  console.log('Gallery directory: ' + GALLERY_DIR);
 });
