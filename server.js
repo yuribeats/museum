@@ -8,14 +8,13 @@ const PORT = process.env.PORT || 3000;
 const IMAGES_DIR = path.join(__dirname, 'public', 'images');
 const ALLOWED_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
 
-const PINATA_API_KEY = 'e45e5fb53dd47783022c';
-const PINATA_SECRET = 'f740458d9919f1d8a669b3ddde0736e10bbee6c648b85a002be6465b1f7705c1';
+const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIwMzMzMzdmOC0wNTEwLTQ4NTQtYmVjYi1iMGRlNGFlNmExMzAiLCJlbWFpbCI6IncueXVyaS5yeWJha0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiZTQ1ZTVmYjUzZGQ0Nzc4MzAyMmMiLCJzY29wZWRLZXlTZWNyZXQiOiJmNzQwNDU4ZDk5MTlmMWQ4YTY2OWIzZGRkZTA3MzZlMTBiYmVlNmM2NDhiODVhMDAyYmU2NDY1YjFmNzcwNWMxIiwiZXhwIjoxODAxMjU3MjI0fQ.4pEiKLAZ3leXirocAE0D7g6XrxlnhWUcCyhs745WLmQ';
 
 let cache = { images: [], timestamp: 0 };
 const CACHE_TTL = 2000;
 
 let galleryCache = { images: [], timestamp: 0 };
-const GALLERY_CACHE_TTL = 30000;
+const GALLERY_CACHE_TTL = 10000;
 
 app.disable('x-powered-by');
 
@@ -72,18 +71,25 @@ async function getGalleryFromPinata() {
     return galleryCache.images;
   }
   try {
-    const response = await fetch('https://api.pinata.cloud/data/pinList?status=pinned&metadata[name]=public-gallery', {
+    console.log('Fetching gallery from Pinata...');
+    const response = await fetch('https://api.pinata.cloud/data/pinList?status=pinned', {
       headers: {
-        'pinata_api_key': PINATA_API_KEY,
-        'pinata_secret_api_key': PINATA_SECRET
+        'Authorization': 'Bearer ' + PINATA_JWT
       }
     });
     const data = await response.json();
-    const images = (data.rows || []).map(row => ({
-      name: row.metadata.name || row.ipfs_pin_hash,
-      url: 'https://gateway.pinata.cloud/ipfs/' + row.ipfs_pin_hash,
-      mtime: new Date(row.date_pinned).getTime()
-    })).sort((a, b) => b.mtime - a.mtime);
+    console.log('Pinata response:', JSON.stringify(data).substring(0, 500));
+    
+    const images = (data.rows || [])
+      .filter(row => row.metadata && row.metadata.name && row.metadata.name.startsWith('public-'))
+      .map(row => ({
+        name: row.metadata.name,
+        url: 'https://gateway.pinata.cloud/ipfs/' + row.ipfs_pin_hash,
+        mtime: new Date(row.date_pinned).getTime()
+      }))
+      .sort((a, b) => b.mtime - a.mtime);
+    
+    console.log('Found gallery images:', images.length);
     galleryCache.images = images;
     galleryCache.timestamp = now;
     return images;
@@ -97,18 +103,22 @@ async function pinToPinata(base64Data, filename) {
   const buffer = Buffer.from(base64Data, 'base64');
   const form = new FormData();
   form.append('file', buffer, { filename: filename, contentType: 'image/png' });
-  form.append('pinataMetadata', JSON.stringify({ name: 'public-gallery' }));
+  form.append('pinataMetadata', JSON.stringify({ name: filename }));
+  
+  console.log('Uploading to Pinata:', filename);
   
   const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
     method: 'POST',
     headers: {
-      'pinata_api_key': PINATA_API_KEY,
-      'pinata_secret_api_key': PINATA_SECRET,
+      'Authorization': 'Bearer ' + PINATA_JWT,
       ...form.getHeaders()
     },
     body: form
   });
-  return await response.json();
+  
+  const result = await response.json();
+  console.log('Pinata upload response:', JSON.stringify(result));
+  return result;
 }
 
 app.use(express.static('public', {
@@ -129,6 +139,7 @@ app.get('/api/gallery', async (req, res) => {
     const images = await getGalleryFromPinata();
     res.json({ images: images });
   } catch (e) {
+    console.error('Gallery error:', e.message);
     res.status(500).json({ error: 'Failed to fetch gallery' });
   }
 });
@@ -142,9 +153,15 @@ app.post('/api/gallery', async (req, res) => {
     const base64Data = image.replace(/^data:image\/png;base64,/, '');
     const filename = 'public-' + Date.now() + '.png';
     const result = await pinToPinata(base64Data, filename);
-    console.log('Pinned to IPFS:', result.IpfsHash);
-    galleryCache.timestamp = 0;
-    res.json({ success: true, url: 'https://gateway.pinata.cloud/ipfs/' + result.IpfsHash });
+    
+    if (result.IpfsHash) {
+      console.log('Pinned to IPFS:', result.IpfsHash);
+      galleryCache.timestamp = 0;
+      res.json({ success: true, url: 'https://gateway.pinata.cloud/ipfs/' + result.IpfsHash });
+    } else {
+      console.error('Pinata error:', result);
+      res.status(500).json({ error: 'Upload failed', details: result });
+    }
   } catch (e) {
     console.error('Pinata upload error:', e.message);
     res.status(500).json({ error: 'Failed to save image' });
