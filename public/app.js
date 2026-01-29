@@ -98,6 +98,11 @@
       textEl.textContent = lastLine;
       fortuneSvg.appendChild(textEl);
       fortuneDiv.appendChild(fortuneSvg);
+      
+      fortuneDiv.onclick = function() {
+        window.location.href = '/gallery.html';
+      };
+      
       fortuneLoaded = true;
       checkAllLoaded();
     });
