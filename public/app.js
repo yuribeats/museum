@@ -14,6 +14,8 @@
       
       var tile = document.createElement('div');
       tile.className = 'tile';
+      tile.style.cursor = 'pointer';
+      tile.onclick = function() { location.reload(); };
 
       var img = document.createElement('img');
       img.src = imageData.url;
