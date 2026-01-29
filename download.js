@@ -1,6 +1,6 @@
 const https=require('https'),fs=require('fs'),path=require('path');
 const API_KEY=process.env.FLICKR_KEY,DEST=path.join(process.env.HOME,'Desktop','museum');
-const KW=['diego rivera','Hieronymus Bosch','Leonardo da Vinci','Caravaggio','Johannes Vermeer'];
+const KW=['ella nova','jane wilde','stella liberty','lady grace marie of LA','grace havermeyer'];
 if(!API_KEY){console.error('Missing FLICKR_KEY');process.exit(1);}
 if(!fs.existsSync(DEST))fs.mkdirSync(DEST,{recursive:true});
 function get(u){return new Promise((r,j)=>{https.get(u,s=>{let d='';s.on('data',c=>d+=c);s.on('end',()=>r(JSON.parse(d)));}).on('error',j);});}
