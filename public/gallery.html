@@ -99,10 +99,6 @@
       }, 300);
     };
     
-    function fastGateway(url) {
-      return url.replace('gateway.pinata.cloud/ipfs/', 'dweb.link/ipfs/');
-    }
-    
     fetch('https://api.museum.ink/api/gallery')
       .then(function(res) { return res.json(); })
       .then(function(data) {
@@ -115,17 +111,13 @@
         }
         data.images.forEach(function(image) {
           var img = document.createElement('img');
-          var url = fastGateway(image.url);
-          img.src = url;
+          img.src = image.url;
           img.alt = image.name;
           img.onload = function() {
             img.classList.add('loaded');
           };
-          img.onerror = function() {
-            img.src = image.url;
-          };
           img.onclick = function() {
-            lightboxImg.src = url;
+            lightboxImg.src = image.url;
             lightbox.classList.add('active');
             setTimeout(function() {
               lightboxImg.classList.add('show');
