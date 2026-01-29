@@ -145,7 +145,7 @@
       ctx.drawImage(canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, sourceWidth, sourceHeight);
       var dataUrl = squareCanvas.toDataURL();
       
-      fetch('/api/gallery', {
+      fetch('https://api.museum.ink/api/gallery', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: dataUrl })
@@ -170,7 +170,7 @@
     .then(function(data) {
       var allImages = data.images || [];
       if (allImages.length === 0) return;
-      var unseenImages = allImages.filter(function(img, i) {
+      var unseenImages = allImages.filter(function(imgg, i) {
         return seenImages.indexOf(i) === -1;
       });
       if (unseenImages.length === 0) {
