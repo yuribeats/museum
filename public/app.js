@@ -87,9 +87,20 @@
       backgroundColor: '#ffffff',
       scale: 2
     }).then(function(canvas) {
+      // Create square canvas by cropping width
+      var size = Math.min(canvas.width, canvas.height);
+      var squareCanvas = document.createElement('canvas');
+      squareCanvas.width = size;
+      squareCanvas.height = size;
+      var ctx = squareCanvas.getContext('2d');
+      
+      // Center crop horizontally
+      var offsetX = (canvas.width - size) / 2;
+      ctx.drawImage(canvas, offsetX, 0, size, size, 0, 0, size, size);
+      
       var link = document.createElement('a');
       link.download = 'public-' + Date.now() + '.png';
-      link.href = canvas.toDataURL();
+      link.href = squareCanvas.toDataURL();
       link.click();
     });
   }
