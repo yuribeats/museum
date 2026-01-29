@@ -96,13 +96,13 @@
         var grid = document.getElementById('gallery-grid');
         data.images.forEach(function(image) {
           var img = document.createElement('img');
-          img.src = 'https://api.museum.ink' + image.url;
+          img.src = image.url;
           img.alt = image.name;
           img.onload = function() {
             img.classList.add('loaded');
           };
           img.onclick = function() {
-            lightboxImg.src = 'https://api.museum.ink' + image.url;
+            lightboxImg.src = image.url;
             lightbox.classList.add('active');
             setTimeout(function() {
               lightboxImg.classList.add('show');
