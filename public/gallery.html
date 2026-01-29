@@ -24,6 +24,7 @@
       transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       background: #f0f0f0;
       position: relative;
+      border: 1px solid #000;
     }
     .thumb.loaded {
       opacity: 1;
@@ -134,7 +135,6 @@
           img.src = url;
           img.alt = image.name;
           img.onload = function() {
-            // Scale image to fill 150x150 container
             var scale = Math.max(150 / img.naturalWidth, 150 / img.naturalHeight);
             img.style.width = (img.naturalWidth * scale) + 'px';
             img.style.height = (img.naturalHeight * scale) + 'px';
