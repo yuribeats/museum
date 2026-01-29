@@ -6,6 +6,10 @@
     .then(function(text) {
       var fortunes = text.split('%').map(function(f) { return f.trim(); }).filter(Boolean);
       var fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+      
+      // Remove emdash and everything after it
+      fortune = fortune.split('―')[0].split('—')[0].split('--')[0].trim();
+      
       var fortuneText = fortune.replace(/\n/g, ' ').replace(/\s+/g, ' ').toUpperCase();
       
       var fortuneDiv = document.getElementById('fortune');
@@ -35,7 +39,7 @@
       
       document.body.removeChild(testDiv);
       
-      // Create SVG for each line - wider viewBox = shorter text
+      // Create SVG for each line
       lines.forEach(function(line) {
         var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttribute('viewBox', '0 0 100 12');
