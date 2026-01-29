@@ -21,13 +21,16 @@ if (fs.existsSync(IMAGES_DIR)) {
     
     files.push({
       name: file,
-      url: '/images/' + encodeURIComponent(file),
-      mtime: stats.mtime.getTime()
+      url: '/images/' + encodeURIComponent(file)
     });
   }
   
-  files.sort((a, b) => b.mtime - a.mtime);
+  // Shuffle array randomly
+  for (let i = files.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [files[i], files[j]] = [files[j], files[i]];
+  }
 }
 
 fs.writeFileSync(OUTPUT_FILE, JSON.stringify({ images: files, total: files.length }));
-console.log('Generated images.json with ' + files.length + ' images');
+console.log('Generated images.json with ' + files.length + ' images (randomized)');
