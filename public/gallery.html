@@ -8,20 +8,52 @@
   <style>
     #gallery-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 15px;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 8px;
       margin-top: 15px;
     }
     #gallery-grid img {
       width: 100%;
-      height: auto;
+      aspect-ratio: 1;
+      object-fit: cover;
       display: block;
       cursor: pointer;
       opacity: 0;
       transform: scale(0.96);
       transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     }
+    #gallery-grid img:hover {
+      opacity: 0.8;
+    }
     #gallery-grid img.loaded {
+      opacity: 1;
+      transform: scale(1);
+    }
+    #lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.95);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+    #lightbox.active {
+      display: flex;
+    }
+    #lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      opacity: 0;
+      transform: scale(0.96);
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #lightbox img.show {
       opacity: 1;
       transform: scale(1);
     }
@@ -38,7 +70,20 @@
   <main>
     <div id="gallery-grid"></div>
   </main>
+  <div id="lightbox">
+    <img src="" alt="">
+  </div>
   <script>
+    var lightbox = document.getElementById('lightbox');
+    var lightboxImg = lightbox.querySelector('img');
+    
+    lightbox.onclick = function() {
+      lightboxImg.classList.remove('show');
+      setTimeout(function() {
+        lightbox.classList.remove('active');
+      }, 300);
+    };
+    
     fetch('https://api.museum.ink/api/gallery')
       .then(function(res) { return res.json(); })
       .then(function(data) {
@@ -51,7 +96,11 @@
             img.classList.add('loaded');
           };
           img.onclick = function() {
-            window.open('https://api.museum.ink' + image.url, '_blank');
+            lightboxImg.src = 'https://api.museum.ink' + image.url;
+            lightbox.classList.add('active');
+            setTimeout(function() {
+              lightboxImg.classList.add('show');
+            }, 50);
           };
           grid.appendChild(img);
         });
