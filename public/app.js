@@ -10,8 +10,8 @@
       // Remove emdash and everything after it
       fortune = fortune.split('―')[0].split('—')[0].split('--')[0].trim();
       
-      // Replace quotes with space, remove periods
-      fortune = fortune.replace(/"/g, ' ').replace(/"/g, ' ').replace(/"/g, ' ').replace(/\./g, '');
+      // Replace quotes with space, remove periods and brackets
+      fortune = fortune.replace(/"/g, ' ').replace(/"/g, ' ').replace(/"/g, ' ').replace(/\./g, '').replace(/\]/g, '');
       
       var fortuneText = fortune.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase();
       
