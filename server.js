@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const fetch = require('node-fetch');
 const FormData = require('form-data');
 
 const app = express();
@@ -78,7 +79,7 @@ async function getGalleryFromPinata() {
       }
     });
     const data = await response.json();
-    console.log('Pinata response:', JSON.stringify(data).substring(0, 500));
+    console.log('Pinata rows:', data.rows ? data.rows.length : 0);
     
     const images = (data.rows || [])
       .filter(row => row.metadata && row.metadata.name && row.metadata.name.startsWith('public-'))
@@ -102,10 +103,24 @@ async function getGalleryFromPinata() {
 async function pinToPinata(base64Data, filename) {
   const buffer = Buffer.from(base64Data, 'base64');
   const form = new FormData();
-  form.append('file', buffer, { filename: filename, contentType: 'image/png' });
-  form.append('pinataMetadata', JSON.stringify({ name: filename }));
   
-  console.log('Uploading to Pinata:', filename);
+  form.append('file', buffer, {
+    filename: filename,
+    contentType: 'image/png',
+    knownLength: buffer.length
+  });
+  
+  const metadata = JSON.stringify({
+    name: filename
+  });
+  form.append('pinataMetadata', metadata);
+  
+  const options = JSON.stringify({
+    cidVersion: 0
+  });
+  form.append('pinataOptions', options);
+  
+  console.log('Uploading to Pinata:', filename, 'size:', buffer.length);
   
   const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
     method: 'POST',
@@ -116,9 +131,15 @@ async function pinToPinata(base64Data, filename) {
     body: form
   });
   
-  const result = await response.json();
-  console.log('Pinata upload response:', JSON.stringify(result));
-  return result;
+  const responseText = await response.text();
+  console.log('Pinata raw response:', responseText);
+  
+  try {
+    return JSON.parse(responseText);
+  } catch (e) {
+    console.error('Failed to parse Pinata response');
+    return { error: responseText };
+  }
 }
 
 app.use(express.static('public', {
@@ -148,6 +169,7 @@ app.post('/api/gallery', async (req, res) => {
   try {
     const { image } = req.body;
     if (!image || !image.startsWith('data:image/png;base64,')) {
+      console.log('Invalid image data received');
       return res.status(400).json({ error: 'Invalid image data' });
     }
     const base64Data = image.replace(/^data:image\/png;base64,/, '');
@@ -155,15 +177,15 @@ app.post('/api/gallery', async (req, res) => {
     const result = await pinToPinata(base64Data, filename);
     
     if (result.IpfsHash) {
-      console.log('Pinned to IPFS:', result.IpfsHash);
+      console.log('Successfully pinned:', result.IpfsHash);
       galleryCache.timestamp = 0;
       res.json({ success: true, url: 'https://gateway.pinata.cloud/ipfs/' + result.IpfsHash });
     } else {
-      console.error('Pinata error:', result);
+      console.error('Pinata error response:', result);
       res.status(500).json({ error: 'Upload failed', details: result });
     }
   } catch (e) {
-    console.error('Pinata upload error:', e.message);
+    console.error('Pinata upload error:', e.message, e.stack);
     res.status(500).json({ error: 'Failed to save image' });
   }
 });
