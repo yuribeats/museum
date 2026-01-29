@@ -11,7 +11,6 @@
       var fortuneDiv = document.getElementById('fortune');
       fortuneDiv.innerHTML = '';
       
-      // Create a temporary span to measure text
       var words = fortuneText.split(' ');
       var lines = [];
       var currentLine = '';
@@ -36,10 +35,10 @@
       
       document.body.removeChild(testDiv);
       
-      // Create SVG for each line
+      // Create SVG for each line - wider viewBox = shorter text
       lines.forEach(function(line) {
         var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('viewBox', '0 0 100 22');
+        svg.setAttribute('viewBox', '0 0 100 12');
         svg.setAttribute('preserveAspectRatio', 'none');
         svg.style.width = '100%';
         svg.style.height = 'auto';
@@ -47,10 +46,10 @@
         
         var textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         textEl.setAttribute('x', '0');
-        textEl.setAttribute('y', '19');
+        textEl.setAttribute('y', '10');
         textEl.setAttribute('font-family', 'Arial Black, Arial, sans-serif');
         textEl.setAttribute('font-weight', '900');
-        textEl.setAttribute('font-size', '22');
+        textEl.setAttribute('font-size', '12');
         textEl.setAttribute('fill', '#000');
         textEl.setAttribute('textLength', '100');
         textEl.setAttribute('lengthAdjust', 'spacingAndGlyphs');
