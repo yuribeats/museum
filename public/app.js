@@ -15,7 +15,7 @@
       fortune = fortune.split('―')[0].split('—')[0].split('--')[0].trim();
       
       // Remove all characters except letters and spaces
-      fortune = fortune.replace(/[^a-zA-Z\s]/g, ' ');
+      fortune = fortune.replace(/[^a-zA-Z\s]/g, '');
       
       var fortuneText = fortune.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase();
       
