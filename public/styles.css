@@ -69,11 +69,6 @@ main {
   visibility: hidden;
 }
 
-.fortune {
-  width: 100%;
-  padding-top: clamp(16px, 3vw, 32px);
-}
-
 #sentinel {
   height: 1px;
   width: 100%;
@@ -92,30 +87,19 @@ main {
   display: none;
 }
 
+#fortune {
+  width: 100%;
+  margin-top: clamp(16px, 3vw, 32px);
+  font-family: "Arial Black", Arial, sans-serif;
+  font-weight: 900;
+  font-size: clamp(18px, 4vw, 32px);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: #000;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
   }
-}
-
-#fortune {
-  width: 100%;
-  margin-top: clamp(16px, 3vw, 32px);
-}
-
-#fortune svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-#fortune {
-  width: 100%;
-  margin-top: clamp(16px, 3vw, 32px);
-}
-
-#fortune svg {
-  width: 100%;
-  height: auto;
-  display: block;
 }
