@@ -29,6 +29,9 @@ main {
   max-width: 643px;
   margin: 0 auto;
   padding: 0 clamp(16px, 4vw, 48px) 20px;
+  min-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
 }
 
 #gallery {
@@ -87,8 +90,9 @@ main {
 }
 
 #footer {
-  width: 100%;
-  margin-top: 15px;
+  width: 10%;
+  margin-top: auto;
+  padding-top: 40px;
 }
 
 #hash {
