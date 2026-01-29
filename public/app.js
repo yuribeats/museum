@@ -6,6 +6,10 @@
   script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
   document.head.appendChild(script);
 
+  // Get seen items from localStorage
+  var seenImages = JSON.parse(localStorage.getItem('seenImages') || '[]');
+  var seenFortunes = JSON.parse(localStorage.getItem('seenFortunes') || '[]');
+
   // Setup header fade
   var header = document.querySelector('header');
   var headerSvg = header.querySelector('svg');
@@ -47,8 +51,27 @@
   fetch('/fortunes.txt')
     .then(function(res) { return res.text(); })
     .then(function(text) {
-      var fortunes = text.split('%').map(function(f) { return f.trim(); }).filter(Boolean);
-      var fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+      var allFortunes = text.split('%').map(function(f) { return f.trim(); }).filter(Boolean);
+      
+      // Filter out seen fortunes
+      var unseenFortunes = allFortunes.filter(function(f, i) {
+        return seenFortunes.indexOf(i) === -1;
+      });
+      
+      // Reset if all seen
+      if (unseenFortunes.length === 0) {
+        seenFortunes = [];
+        localStorage.setItem('seenFortunes', '[]');
+        unseenFortunes = allFortunes;
+      }
+      
+      var randomIndex = Math.floor(Math.random() * unseenFortunes.length);
+      var fortune = unseenFortunes[randomIndex];
+      
+      // Track seen fortune by original index
+      var originalIndex = allFortunes.indexOf(fortune);
+      seenFortunes.push(originalIndex);
+      localStorage.setItem('seenFortunes', JSON.stringify(seenFortunes));
       
       fortune = fortune.split('―')[0].split('—')[0].split('--')[0].trim();
       
@@ -165,11 +188,28 @@
   fetch('/images.json')
     .then(function(res) { return res.json(); })
     .then(function(data) {
-      var images = data.images || [];
-      if (images.length === 0) return;
+      var allImages = data.images || [];
+      if (allImages.length === 0) return;
       
-      var randomIndex = Math.floor(Math.random() * images.length);
-      var imageData = images[randomIndex];
+      // Filter out seen images
+      var unseenImages = allImages.filter(function(img, i) {
+        return seenImages.indexOf(i) === -1;
+      });
+      
+      // Reset if all seen
+      if (unseenImages.length === 0) {
+        seenImages = [];
+        localStorage.setItem('seenImages', '[]');
+        unseenImages = allImages;
+      }
+      
+      var randomIndex = Math.floor(Math.random() * unseenImages.length);
+      var imageData = unseenImages[randomIndex];
+      
+      // Track seen image by original index
+      var originalIndex = allImages.indexOf(imageData);
+      seenImages.push(originalIndex);
+      localStorage.setItem('seenImages', JSON.stringify(seenImages));
       
       var tile = document.createElement('div');
       tile.className = 'tile';
