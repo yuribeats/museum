@@ -16,18 +16,28 @@ body {
 }
 
 header {
-  padding: clamp(40px, 8vw, 80px) 20px clamp(30px, 6vw, 60px);
-  text-align: center;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: clamp(40px, 8vw, 80px) clamp(16px, 4vw, 48px) clamp(30px, 6vw, 60px);
 }
 
 header h1 {
   font-family: "Arial Black", Arial, Helvetica, sans-serif;
   font-weight: 900;
-  font-size: clamp(36px, 6vw, 64px);
-  letter-spacing: 0.2em;
+  font-size: 19vw;
+  letter-spacing: 0.02em;
   color: #000000;
   text-transform: uppercase;
   text-decoration: none;
+  line-height: 1;
+  text-align: center;
+}
+
+@media (min-width: 1000px) {
+  header h1 {
+    font-size: 190px;
+  }
 }
 
 main {
