@@ -18,12 +18,13 @@
     }
     .thumb {
       width: 100%;
+      aspect-ratio: 1 / 1;
       overflow: hidden;
       cursor: pointer;
       opacity: 0;
       transform: scale(0.96);
       transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      background: #f0f0f0;
+      background: #fff;
       position: relative;
       border: 1px solid #000;
     }
@@ -40,7 +41,9 @@
     }
     .thumb img {
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
       display: block;
     }
     #lightbox {
