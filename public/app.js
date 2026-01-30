@@ -47,6 +47,32 @@
     }
   }
 
+  function loadNewComposition() {
+    if (img) {
+      img.style.opacity = '0';
+      img.style.transform = 'scale(0.98)';
+      img.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+    }
+    if (fortuneSvg) {
+      fortuneSvg.style.opacity = '0';
+      fortuneSvg.style.transform = 'translateY(8px)';
+      fortuneSvg.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+    }
+    headerSvg.style.opacity = '0';
+    headerSvg.style.transform = 'translateY(-8px)';
+    headerSvg.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+    setTimeout(function() {
+      location.reload();
+    }, 300);
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      loadNewComposition();
+    }
+  });
+
   fetch('/fortunes.txt')
     .then(function(res) { return res.text(); })
     .then(function(text) {
@@ -191,20 +217,7 @@
         checkAllLoaded();
       };
       tile.onclick = function() {
-        img.style.opacity = '0';
-        img.style.transform = 'scale(0.98)';
-        img.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-        if (fortuneSvg) {
-          fortuneSvg.style.opacity = '0';
-          fortuneSvg.style.transform = 'translateY(8px)';
-          fortuneSvg.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-        }
-        headerSvg.style.opacity = '0';
-        headerSvg.style.transform = 'translateY(-8px)';
-        headerSvg.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-        setTimeout(function() {
-          location.reload();
-        }, 300);
+        loadNewComposition();
       };
       img.onerror = function() {
         tile.classList.add('error');
