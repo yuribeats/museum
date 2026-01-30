@@ -7,6 +7,7 @@
 
   var seenImages = JSON.parse(localStorage.getItem('seenImages') || '[]');
   var seenFortunes = JSON.parse(localStorage.getItem('seenFortunes') || '[]');
+  var screenshotTaken = false;
 
   var headerText = document.getElementById('header-text');
   var headerSvg = headerText.querySelector('svg');
@@ -110,7 +111,10 @@
   var gallery = document.getElementById('gallery');
 
   function takeScreenshot() {
+    if (screenshotTaken) return;
     if (typeof html2canvas === 'undefined') return;
+    
+    screenshotTaken = true;
     
     var flash = document.createElement('div');
     flash.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;opacity:0;z-index:9999;pointer-events:none;transition:opacity 0.1s';
