@@ -30,6 +30,7 @@
     }
     .thumb {
       width: 100%;
+      aspect-ratio: 1 / 1.1;
       overflow: hidden;
       cursor: pointer;
       opacity: 0;
@@ -37,6 +38,7 @@
       transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       background: #fff;
       position: relative;
+      border: 1px solid #000;
     }
     .thumb.loaded {
       opacity: 1;
@@ -51,7 +53,9 @@
     }
     .thumb img {
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: cover;
+      object-position: top;
       display: block;
     }
     #lightbox {
@@ -65,7 +69,6 @@
       z-index: 9999;
       justify-content: center;
       align-items: center;
-      cursor: pointer;
     }
     #lightbox.active {
       display: flex;
@@ -74,13 +77,7 @@
       max-width: 95%;
       max-height: 95%;
       object-fit: contain;
-      opacity: 0;
-      transform: scale(0.96);
-      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    #lightbox img.show {
-      opacity: 1;
-      transform: scale(1);
+      cursor: pointer;
     }
     #loading {
       text-align: center;
@@ -103,108 +100,107 @@
     <div id="gallery-grid"></div>
   </main>
   <div id="lightbox">
-    <img src="" alt="">
+    <img id="lightbox-img" src="" alt="">
   </div>
   <script>
-    var lightbox = document.getElementById('lightbox');
-    var lightboxImg = lightbox.querySelector('img');
-    var loading = document.getElementById('loading');
-    var allImages = [];
-    var currentIndex = -1;
-    
-    function showImage(index) {
-      if (index < 0 || index >= allImages.length) return;
-      currentIndex = index;
-      lightboxImg.classList.remove('show');
-      setTimeout(function() {
+    (function() {
+      var lightbox = document.getElementById('lightbox');
+      var lightboxImg = document.getElementById('lightbox-img');
+      var loading = document.getElementById('loading');
+      var allImages = [];
+      var currentIndex = -1;
+      
+      function showImage(index) {
+        if (allImages.length === 0) return;
+        if (index < 0) index = allImages.length - 1;
+        if (index >= allImages.length) index = 0;
+        currentIndex = index;
         lightboxImg.src = allImages[index];
-        setTimeout(function() {
-          lightboxImg.classList.add('show');
-        }, 50);
-      }, 100);
-    }
-    
-    function showRandomImage() {
-      if (allImages.length <= 1) return;
-      var newIndex;
-      do {
-        newIndex = Math.floor(Math.random() * allImages.length);
-      } while (newIndex === currentIndex);
-      showImage(newIndex);
-    }
-    
-    lightbox.onclick = function() {
-      lightboxImg.classList.remove('show');
-      setTimeout(function() {
+      }
+      
+      function showRandomImage() {
+        if (allImages.length <= 1) return;
+        var newIndex;
+        do {
+          newIndex = Math.floor(Math.random() * allImages.length);
+        } while (newIndex === currentIndex && allImages.length > 1);
+        showImage(newIndex);
+      }
+      
+      function closeLightbox() {
         lightbox.classList.remove('active');
         currentIndex = -1;
-      }, 300);
-    };
-    
-    document.addEventListener('keydown', function(e) {
-      if (!lightbox.classList.contains('active')) return;
-      
-      if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        var next = (currentIndex + 1) % allImages.length;
-        showImage(next);
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        var prev = (currentIndex - 1 + allImages.length) % allImages.length;
-        showImage(prev);
-      } else if (e.key === ' ') {
-        e.preventDefault();
-        showRandomImage();
-      } else if (e.key === 'Escape') {
-        lightboxImg.classList.remove('show');
-        setTimeout(function() {
-          lightbox.classList.remove('active');
-          currentIndex = -1;
-        }, 300);
       }
-    });
-    
-    function toFastGateway(url) {
-      return url.replace('gateway.pinata.cloud/ipfs/', 'museum.mypinata.cloud/ipfs/');
-    }
-    
-    fetch('/api/gallery')
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        loading.style.display = 'none';
-        var grid = document.getElementById('gallery-grid');
-        if (data.images.length === 0) {
-          loading.style.display = 'block';
-          loading.textContent = 'No images yet. Click PUBLIC on the main page to add one!';
-          return;
+      
+      lightboxImg.onclick = function(e) {
+        e.stopPropagation();
+        closeLightbox();
+      };
+      
+      lightbox.onclick = function() {
+        closeLightbox();
+      };
+      
+      document.addEventListener('keydown', function(e) {
+        if (!lightbox.classList.contains('active')) return;
+        
+        if (e.key === 'ArrowRight' || e.key === 'Right') {
+          e.preventDefault();
+          showImage(currentIndex + 1);
+        } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
+          e.preventDefault();
+          showImage(currentIndex - 1);
+        } else if (e.key === ' ' || e.key === 'Spacebar') {
+          e.preventDefault();
+          showRandomImage();
+        } else if (e.key === 'Escape' || e.key === 'Esc') {
+          e.preventDefault();
+          closeLightbox();
         }
-        data.images.forEach(function(image, index) {
-          var thumb = document.createElement('div');
-          thumb.className = 'thumb';
-          
-          var img = document.createElement('img');
-          var url = toFastGateway(image.url);
-          allImages.push(url);
-          img.src = url;
-          img.alt = image.name;
-          img.onload = function() {
-            thumb.classList.add('loaded');
-          };
-          thumb.onclick = function() {
-            currentIndex = index;
-            lightboxImg.src = url;
-            lightbox.classList.add('active');
-            setTimeout(function() {
-              lightboxImg.classList.add('show');
-            }, 50);
-          };
-          thumb.appendChild(img);
-          grid.appendChild(thumb);
-        });
-      })
-      .catch(function(err) {
-        loading.textContent = 'Failed to load gallery';
       });
+      
+      function toFastGateway(url) {
+        return url.replace('gateway.pinata.cloud/ipfs/', 'museum.mypinata.cloud/ipfs/');
+      }
+      
+      fetch('/api/gallery')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          loading.style.display = 'none';
+          var grid = document.getElementById('gallery-grid');
+          if (data.images.length === 0) {
+            loading.style.display = 'block';
+            loading.textContent = 'No images yet. Click PUBLIC on the main page to add one!';
+            return;
+          }
+          data.images.forEach(function(image, index) {
+            var url = toFastGateway(image.url);
+            allImages.push(url);
+            
+            var thumb = document.createElement('div');
+            thumb.className = 'thumb';
+            
+            var img = document.createElement('img');
+            img.src = url;
+            img.alt = image.name;
+            img.onload = function() {
+              thumb.classList.add('loaded');
+            };
+            (function(idx) {
+              thumb.onclick = function() {
+                currentIndex = idx;
+                lightboxImg.src = allImages[idx];
+                lightbox.classList.add('active');
+              };
+            })(index);
+            thumb.appendChild(img);
+            grid.appendChild(thumb);
+          });
+        })
+        .catch(function(err) {
+          loading.textContent = 'Failed to load gallery';
+        });
+    })();
   </script>
 </body>
 </html>
