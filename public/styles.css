@@ -47,22 +47,19 @@ main {
 .tile {
   position: relative;
   width: 100%;
-  height: 270px;
   overflow: hidden;
   background: #ffffff;
 }
 
 .tile img {
   width: 100%;
-  height: 270px;
+  height: auto;
   display: block;
-  object-fit: cover;
-  object-position: center;
   background: #ffffff;
 }
 
 .tile.error {
-  height: 270px;
+  aspect-ratio: 16/9;
   background: #ffffff;
   border: 1px solid #000000;
 }
@@ -104,14 +101,6 @@ main {
   
   #composition {
     padding: 10px;
-  }
-  
-  .tile {
-    height: 200px;
-  }
-  
-  .tile img {
-    height: 200px;
   }
 }
 
