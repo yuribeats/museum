@@ -1,0 +1,114 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+header {
+  width: 90%;
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 20px 15px 0;
+}
+
+main {
+  width: 90%;
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 0 15px 20px;
+}
+
+#composition {
+  border: 1px solid #000;
+  padding: 15px;
+}
+
+#header-text {
+  cursor: pointer;
+}
+
+#gallery {
+  margin-top: 15px;
+}
+
+.tile {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  background: #ffffff;
+}
+
+.tile.error {
+  aspect-ratio: 16/9;
+  background: #ffffff;
+  border: 1px solid #000000;
+}
+
+.tile.error img {
+  visibility: hidden;
+}
+
+#sentinel {
+  height: 1px;
+  width: 100%;
+  pointer-events: none;
+}
+
+#loader {
+  text-align: center;
+  padding: 20px;
+  color: #888888;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+}
+
+#loader.hidden {
+  display: none;
+}
+
+#fortune {
+  width: 100%;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  header, main {
+    width: 95%;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  
+  #composition {
+    padding: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

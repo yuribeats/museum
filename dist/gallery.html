@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GALLERY</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    #gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 15px;
+      padding: 0 20px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @media (max-width: 800px) {
+      #gallery-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 500px) {
+      #gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px;
+        padding: 0 10px;
+      }
+    }
+    .thumb {
+      width: 100%;
+      overflow: hidden;
+      cursor: pointer;
+      opacity: 0;
+      transform: scale(0.96);
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      background: #fff;
+      position: relative;
+    }
+    .thumb.loaded {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .thumb:hover {
+      transform: scale(1.05);
+      z-index: 10;
+    }
+    .thumb.loaded:hover {
+      transform: scale(1.05);
+    }
+    .thumb img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    #lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.95);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    #lightbox.active {
+      display: flex;
+    }
+    #lightbox img {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+      cursor: pointer;
+    }
+    #loading {
+      text-align: center;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" style="text-decoration:none;">
+      <svg viewBox="0 0 100 22" preserveAspectRatio="none" style="width:100%;height:auto;display:block;">
+        <text x="0" y="19" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#000" stroke="#000" stroke-width="0.5" textLength="100" lengthAdjust="spacingAndGlyphs">GALLERY</text>
+      </svg>
+    </a>
+  </header>
+  <main>
+    <div id="loading">Loading...</div>
+    <div id="gallery-grid"></div>
+  </main>
+  <div id="lightbox">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+  <script>
+    (function() {
+      var lightbox = document.getElementById('lightbox');
+      var lightboxImg = document.getElementById('lightbox-img');
+      var loading = document.getElementById('loading');
+      var allImages = [];
+      var currentIndex = -1;
+      
+      function showImage(index) {
+        if (allImages.length === 0) return;
+        if (index < 0) index = allImages.length - 1;
+        if (index >= allImages.length) index = 0;
+        currentIndex = index;
+        lightboxImg.src = allImages[index];
+      }
+      
+      function showRandomImage() {
+        if (allImages.length <= 1) return;
+        var newIndex;
+        do {
+          newIndex = Math.floor(Math.random() * allImages.length);
+        } while (newIndex === currentIndex && allImages.length > 1);
+        showImage(newIndex);
+      }
+      
+      function closeLightbox() {
+        lightbox.classList.remove('active');
+        currentIndex = -1;
+      }
+      
+      lightboxImg.onclick = function(e) {
+        e.stopPropagation();
+        closeLightbox();
+      };
+      
+      lightbox.onclick = function() {
+        closeLightbox();
+      };
+      
+      document.addEventListener('keydown', function(e) {
+        if (!lightbox.classList.contains('active')) return;
+        
+        if (e.key === 'ArrowRight' || e.key === 'Right') {
+          e.preventDefault();
+          showImage(currentIndex + 1);
+        } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
+          e.preventDefault();
+          showImage(currentIndex - 1);
+        } else if (e.key === ' ' || e.key === 'Spacebar') {
+          e.preventDefault();
+          showRandomImage();
+        } else if (e.key === 'Escape' || e.key === 'Esc') {
+          e.preventDefault();
+          closeLightbox();
+        }
+      });
+      
+      function toFastGateway(url) {
+        return url.replace('gateway.pinata.cloud/ipfs/', 'museum.mypinata.cloud/ipfs/');
+      }
+      
+      fetch('/api/gallery')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          loading.style.display = 'none';
+          var grid = document.getElementById('gallery-grid');
+          if (data.images.length === 0) {
+            loading.style.display = 'block';
+            loading.textContent = 'No images yet. Click PUBLIC on the main page to add one!';
+            return;
+          }
+          data.images.forEach(function(image, index) {
+            var url = toFastGateway(image.url);
+            allImages.push(url);
+            
+            var thumb = document.createElement('div');
+            thumb.className = 'thumb';
+            
+            var img = document.createElement('img');
+            img.src = url;
+            img.alt = image.name;
+            img.onload = function() {
+              thumb.classList.add('loaded');
+            };
+            (function(idx) {
+              thumb.onclick = function() {
+                currentIndex = idx;
+                lightboxImg.src = allImages[idx];
+                lightbox.classList.add('active');
+              };
+            })(index);
+            thumb.appendChild(img);
+            grid.appendChild(thumb);
+          });
+        })
+        .catch(function(err) {
+          loading.textContent = 'Failed to load gallery';
+        });
+    })();
+  </script>
+</body>
+</html>
