@@ -19,6 +19,8 @@
 
   var fortuneSvg = null;
   var img = null;
+  var currentImageSrc = null;
+  var currentFortuneText = null;
 
   function fadeInAll() {
     headerSvg.style.opacity = '1';
@@ -75,6 +77,7 @@
         lines.push(line);
       }
       var lastLine = lines[lines.length - 1];
+      currentFortuneText = lastLine;
       fortuneSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       fortuneSvg.setAttribute('viewBox', '0 0 100 22');
       fortuneSvg.setAttribute('preserveAspectRatio', 'none');
@@ -112,6 +115,7 @@
 
   function takeScreenshot() {
     if (typeof html2canvas === 'undefined') return;
+    
     var flash = document.createElement('div');
     flash.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;opacity:0;z-index:9999;pointer-events:none;transition:opacity 0.1s';
     document.body.appendChild(flash);
@@ -125,49 +129,62 @@
       }, 100);
     });
     
-    var main = document.querySelector('main');
-    var headerEl = document.querySelector('header');
-    var fortuneEl = document.getElementById('fortune');
+    // Create fixed-width container for screenshot
+    var container = document.createElement('div');
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + FIXED_WIDTH + 'px;background:#fff;padding:20px;border:1px solid #000;';
     
-    var clone = document.createElement('div');
-    clone.style.cssText = 'position:absolute;left:-9999px;top:0;width:' + FIXED_WIDTH + 'px;padding:15px;border:1px solid #000;background:#fff;';
+    // Header
+    var headerDiv = document.createElement('div');
+    headerDiv.innerHTML = '<svg viewBox="0 0 100 22" preserveAspectRatio="none" style="width:100%;height:auto;display:block;"><text x="0" y="19" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#000" stroke="#000" stroke-width="0.5" textLength="100" lengthAdjust="spacingAndGlyphs">PUBLIC</text></svg>';
+    container.appendChild(headerDiv);
     
-    var headerClone = headerEl.cloneNode(true);
-    headerClone.style.cssText = 'width:100%;max-width:none;padding:0;margin:0;';
-    clone.appendChild(headerClone);
+    // Image
+    var imgDiv = document.createElement('div');
+    imgDiv.style.cssText = 'margin-top:15px;border:1px solid #000;';
+    var imgEl = document.createElement('img');
+    imgEl.src = currentImageSrc;
+    imgEl.style.cssText = 'width:100%;height:auto;display:block;';
+    imgDiv.appendChild(imgEl);
+    container.appendChild(imgDiv);
     
-    var galleryClone = gallery.cloneNode(true);
-    galleryClone.style.cssText = 'width:100%;margin-top:15px;';
-    clone.appendChild(galleryClone);
+    // Fortune
+    var fortuneDiv = document.createElement('div');
+    fortuneDiv.style.cssText = 'margin-top:15px;';
+    fortuneDiv.innerHTML = '<svg viewBox="0 0 100 22" preserveAspectRatio="none" style="width:100%;height:auto;display:block;"><text x="0" y="19" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#000" stroke="#000" stroke-width="0.5" textLength="100" lengthAdjust="spacingAndGlyphs">' + currentFortuneText + '</text></svg>';
+    container.appendChild(fortuneDiv);
     
-    var fortuneClone = fortuneEl.cloneNode(true);
-    fortuneClone.style.cssText = 'width:100%;margin-top:15px;';
-    clone.appendChild(fortuneClone);
+    document.body.appendChild(container);
     
-    document.body.appendChild(clone);
-    
-    html2canvas(clone, {
-      backgroundColor: '#ffffff',
-      scale: 2
-    }).then(function(canvas) {
-      document.body.removeChild(clone);
-      var dataUrl = canvas.toDataURL();
-      
-      fetch('https://api.museum.ink/api/gallery', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: dataUrl })
-      }).then(function(res) { return res.json(); }).then(function(data) {
-        console.log('Saved to gallery:', data.url);
-      }).catch(function(err) {
-        console.error('Failed to save to gallery', err);
+    // Wait for image to load in clone
+    imgEl.onload = function() {
+      html2canvas(container, {
+        backgroundColor: '#ffffff',
+        scale: 2
+      }).then(function(canvas) {
+        document.body.removeChild(container);
+        var dataUrl = canvas.toDataURL();
+        
+        fetch('https://api.museum.ink/api/gallery', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: dataUrl })
+        }).then(function(res) { return res.json(); }).then(function(data) {
+          console.log('Saved to gallery:', data.url);
+        }).catch(function(err) {
+          console.error('Failed to save to gallery', err);
+        });
+        
+        var link = document.createElement('a');
+        link.download = 'public-' + Date.now() + '.png';
+        link.href = dataUrl;
+        link.click();
       });
-      
-      var link = document.createElement('a');
-      link.download = 'public-' + Date.now() + '.png';
-      link.href = dataUrl;
-      link.click();
-    });
+    };
+    
+    // If image already cached
+    if (imgEl.complete) {
+      imgEl.onload();
+    }
   }
 
   header.style.cursor = 'pointer';
@@ -197,6 +214,7 @@
       tile.style.overflow = 'hidden';
       img = document.createElement('img');
       img.src = imageData.url;
+      currentImageSrc = imageData.url;
       img.alt = imageData.name || '';
       img.style.opacity = '0';
       img.style.transform = 'scale(0.96)';
