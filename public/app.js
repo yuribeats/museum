@@ -66,12 +66,14 @@
     }, 300);
   }
 
-  window.addEventListener('keydown', function(e) {
-    if (e.key === ' ' || e.key === 'Spacebar') {
+  document.onkeydown = function(e) {
+    if (e.keyCode === 32 || e.key === ' ' || e.key === 'Spacebar') {
       e.preventDefault();
+      e.stopPropagation();
       loadNewComposition();
+      return false;
     }
-  });
+  };
 
   fetch('/fortunes.txt')
     .then(function(res) { return res.text(); })
