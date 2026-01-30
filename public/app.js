@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
   'use strict';
 
   var script = document.createElement('script');
@@ -64,14 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
       location.reload();
     }, 300);
-  };
-
-  document.onkeydown = function(e) {
-    if (e.keyCode === 32 || e.key === ' ') {
-      e.preventDefault();
-      window.loadNewComposition();
-      return false;
-    }
   };
 
   fetch('/fortunes.txt')
@@ -248,4 +240,15 @@ document.addEventListener('DOMContentLoaded', function() {
       tile.appendChild(img);
       gallery.appendChild(tile);
     });
-});
+})();
+
+// Spacebar handler outside IIFE
+document.onkeydown = function(e) {
+  if (e.keyCode === 32 || e.key === ' ') {
+    e.preventDefault();
+    if (window.loadNewComposition) {
+      window.loadNewComposition();
+    }
+    return false;
+  }
+};
