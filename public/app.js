@@ -160,7 +160,7 @@
         document.body.removeChild(container);
         var dataUrl = canvas.toDataURL();
         
-        fetch('https://api.museum.ink/api/gallery', {
+        fetch('/api/gallery', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: dataUrl })

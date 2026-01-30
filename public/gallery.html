@@ -116,7 +116,7 @@
       return url.replace('gateway.pinata.cloud/ipfs/', 'museum.mypinata.cloud/ipfs/');
     }
     
-    fetch('https://api.museum.ink/api/gallery')
+    fetch('/api/gallery')
       .then(function(res) { return res.json(); })
       .then(function(data) {
         loading.style.display = 'none';
