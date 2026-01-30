@@ -8,11 +8,11 @@
   var seenImages = JSON.parse(localStorage.getItem('seenImages') || '[]');
   var seenFortunes = JSON.parse(localStorage.getItem('seenFortunes') || '[]');
 
-  var headerText = document.getElementById('header-text');
-  var headerSvg = headerText.querySelector('svg');
-  var headerTextEl = headerSvg.querySelector('text');
-  headerTextEl.setAttribute('stroke', '#000');
-  headerTextEl.setAttribute('stroke-width', '0.5');
+  var header = document.querySelector('header');
+  var headerSvg = header.querySelector('svg');
+  var headerText = headerSvg.querySelector('text');
+  headerText.setAttribute('stroke', '#000');
+  headerText.setAttribute('stroke-width', '0.5');
   headerSvg.style.opacity = '0';
   headerSvg.style.transform = 'translateY(-8px)';
   headerSvg.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
@@ -108,6 +108,7 @@
     });
 
   var gallery = document.getElementById('gallery');
+  var FIXED_WIDTH = 600;
 
   function takeScreenshot() {
     if (typeof html2canvas === 'undefined') return;
@@ -124,16 +125,32 @@
       }, 100);
     });
     
-    var composition = document.getElementById('composition');
-    var originalWidth = composition.style.width;
-    composition.style.width = '600px';
+    var main = document.querySelector('main');
+    var headerEl = document.querySelector('header');
+    var fortuneEl = document.getElementById('fortune');
     
-    html2canvas(composition, {
+    var clone = document.createElement('div');
+    clone.style.cssText = 'position:absolute;left:-9999px;top:0;width:' + FIXED_WIDTH + 'px;padding:15px;border:1px solid #000;background:#fff;';
+    
+    var headerClone = headerEl.cloneNode(true);
+    headerClone.style.cssText = 'width:100%;max-width:none;padding:0;margin:0;';
+    clone.appendChild(headerClone);
+    
+    var galleryClone = gallery.cloneNode(true);
+    galleryClone.style.cssText = 'width:100%;margin-top:15px;';
+    clone.appendChild(galleryClone);
+    
+    var fortuneClone = fortuneEl.cloneNode(true);
+    fortuneClone.style.cssText = 'width:100%;margin-top:15px;';
+    clone.appendChild(fortuneClone);
+    
+    document.body.appendChild(clone);
+    
+    html2canvas(clone, {
       backgroundColor: '#ffffff',
-      scale: 2,
-      width: 600
+      scale: 2
     }).then(function(canvas) {
-      composition.style.width = originalWidth;
+      document.body.removeChild(clone);
       var dataUrl = canvas.toDataURL();
       
       fetch('https://api.museum.ink/api/gallery', {
@@ -153,7 +170,8 @@
     });
   }
 
-  headerText.onclick = takeScreenshot;
+  header.style.cursor = 'pointer';
+  header.onclick = takeScreenshot;
 
   fetch('/images.json')
     .then(function(res) { return res.json(); })

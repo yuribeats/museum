@@ -29,9 +29,6 @@ main {
   max-width: 643px;
   margin: 0 auto;
   padding: 0 clamp(16px, 4vw, 48px) 20px;
-  min-height: calc(100vh - 100px);
-  display: flex;
-  flex-direction: column;
 }
 
 #gallery {
@@ -89,11 +86,6 @@ main {
   width: 100%;
   margin-top: 15px;
   cursor: pointer;
-}
-
-#hash {
-  width: 100%;
-  margin-top: 10px;
 }
 
 @media (prefers-reduced-motion: reduce) {
