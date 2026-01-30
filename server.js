@@ -5,7 +5,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const IMAGES_DIR = path.join(__dirname, 'public', 'images');
 const ALLOWED_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
 
@@ -73,7 +73,7 @@ async function getGalleryFromPinata() {
   }
   try {
     console.log('Fetching gallery from Pinata...');
-    const response = await axios.get('https://api.pinata.cloud/data/pinList?status=pinned', {
+    const response = await axios.get('https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=1000', {
       headers: {
         'Authorization': 'Bearer ' + PINATA_JWT
       }
