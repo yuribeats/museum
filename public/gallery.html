@@ -7,16 +7,15 @@
   <link rel="stylesheet" href="styles.css">
   <style>
     #gallery-grid {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, 200px);
       gap: 8px;
       margin-top: 15px;
       justify-content: center;
     }
     .thumb {
-      flex: 0 0 150px;
-      width: 150px;
-      height: 150px;
+      width: 200px;
+      height: 250px;
       overflow: hidden;
       cursor: pointer;
       opacity: 0;
@@ -31,23 +30,18 @@
       transform: scale(1);
     }
     .thumb:hover {
-      transform: scale(1.1);
+      transform: scale(1.05);
       z-index: 10;
     }
     .thumb.loaded:hover {
-      transform: scale(1.1);
+      transform: scale(1.05);
     }
     .thumb img {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      min-width: 100%;
-      min-height: 100%;
-      width: auto;
-      height: auto;
-      max-width: none;
-      max-height: none;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
     }
     #lightbox {
       display: none;
@@ -135,9 +129,6 @@
           img.src = url;
           img.alt = image.name;
           img.onload = function() {
-            var scale = Math.max(150 / img.naturalWidth, 150 / img.naturalHeight);
-            img.style.width = (img.naturalWidth * scale) + 'px';
-            img.style.height = (img.naturalHeight * scale) + 'px';
             thumb.classList.add('loaded');
           };
           thumb.onclick = function() {
