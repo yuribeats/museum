@@ -111,7 +111,7 @@
     });
 
   var gallery = document.getElementById('gallery');
-  var FIXED_WIDTH = 600;
+  var FIXED_WIDTH = 750;
   var FIXED_HEIGHT = 500;
 
   function takeScreenshot() {
