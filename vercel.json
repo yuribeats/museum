@@ -1,5 +1,6 @@
 {
-  "public": true,
+  "buildCommand": "",
+  "outputDirectory": "public",
   "rewrites": [
     { "source": "/api/gallery", "destination": "/api/gallery" }
   ]
