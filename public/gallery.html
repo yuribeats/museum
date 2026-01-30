@@ -8,14 +8,14 @@
   <style>
     #gallery-grid {
       display: grid;
-      grid-template-columns: repeat(3, 200px);
+      grid-template-columns: repeat(3, 180px);
       gap: 8px;
       margin-top: 15px;
       justify-content: center;
     }
     .thumb {
-      width: 200px;
-      height: 250px;
+      width: 180px;
+      aspect-ratio: 675 / 450;
       overflow: hidden;
       cursor: pointer;
       opacity: 0;
@@ -39,8 +39,7 @@
     .thumb img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
-      object-position: center;
+      object-fit: fill;
       display: block;
     }
     #lightbox {
