@@ -1,6 +1,3 @@
 {
-  "outputDirectory": "public",
-  "rewrites": [
-    { "source": "/api/gallery", "destination": "/api/gallery" }
-  ]
+  "outputDirectory": "public"
 }
