@@ -36,9 +36,11 @@ main {
   padding: 15px;
 }
 
+#header-text {
+  cursor: pointer;
+}
+
 #gallery {
-  display: flex;
-  flex-direction: column;
   margin-top: 15px;
 }
 
@@ -52,7 +54,7 @@ main {
 
 .tile img {
   width: 100%;
-  height: 100%;
+  height: 400px;
   display: block;
   object-fit: cover;
   object-position: center;
@@ -60,7 +62,7 @@ main {
 }
 
 .tile.error {
-  aspect-ratio: 1 / 1;
+  height: 400px;
   background: #ffffff;
   border: 1px solid #000000;
 }
