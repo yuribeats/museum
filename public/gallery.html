@@ -109,13 +109,60 @@
     var lightbox = document.getElementById('lightbox');
     var lightboxImg = lightbox.querySelector('img');
     var loading = document.getElementById('loading');
+    var allImages = [];
+    var currentIndex = -1;
+    
+    function showImage(index) {
+      if (index < 0 || index >= allImages.length) return;
+      currentIndex = index;
+      lightboxImg.classList.remove('show');
+      setTimeout(function() {
+        lightboxImg.src = allImages[index];
+        setTimeout(function() {
+          lightboxImg.classList.add('show');
+        }, 50);
+      }, 100);
+    }
+    
+    function showRandomImage() {
+      if (allImages.length <= 1) return;
+      var newIndex;
+      do {
+        newIndex = Math.floor(Math.random() * allImages.length);
+      } while (newIndex === currentIndex);
+      showImage(newIndex);
+    }
     
     lightbox.onclick = function() {
       lightboxImg.classList.remove('show');
       setTimeout(function() {
         lightbox.classList.remove('active');
+        currentIndex = -1;
       }, 300);
     };
+    
+    document.addEventListener('keydown', function(e) {
+      if (!lightbox.classList.contains('active')) return;
+      
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        var next = (currentIndex + 1) % allImages.length;
+        showImage(next);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        var prev = (currentIndex - 1 + allImages.length) % allImages.length;
+        showImage(prev);
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        showRandomImage();
+      } else if (e.key === 'Escape') {
+        lightboxImg.classList.remove('show');
+        setTimeout(function() {
+          lightbox.classList.remove('active');
+          currentIndex = -1;
+        }, 300);
+      }
+    });
     
     function toFastGateway(url) {
       return url.replace('gateway.pinata.cloud/ipfs/', 'museum.mypinata.cloud/ipfs/');
@@ -131,18 +178,20 @@
           loading.textContent = 'No images yet. Click PUBLIC on the main page to add one!';
           return;
         }
-        data.images.forEach(function(image) {
+        data.images.forEach(function(image, index) {
           var thumb = document.createElement('div');
           thumb.className = 'thumb';
           
           var img = document.createElement('img');
           var url = toFastGateway(image.url);
+          allImages.push(url);
           img.src = url;
           img.alt = image.name;
           img.onload = function() {
             thumb.classList.add('loaded');
           };
           thumb.onclick = function() {
+            currentIndex = index;
             lightboxImg.src = url;
             lightbox.classList.add('active');
             setTimeout(function() {
