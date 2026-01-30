@@ -193,7 +193,7 @@
     takeScreenshot();
   }, { passive: false });
 
-  fetch('/images.json')
+  fetch('/imagedata.json')
     .then(function(res) { return res.json(); })
     .then(function(data) {
       var allImages = data.images || [];
