@@ -21,14 +21,14 @@ header {
   width: 90%;
   max-width: 580px;
   margin: 0 auto;
-  padding: 20px clamp(16px, 4vw, 48px) 0;
+  padding: 20px 15px 0;
 }
 
 main {
   width: 90%;
   max-width: 580px;
   margin: 0 auto;
-  padding: 0 clamp(16px, 4vw, 48px) 20px;
+  padding: 0 15px 20px;
 }
 
 #composition {
@@ -93,6 +93,26 @@ main {
   width: 100%;
   margin-top: 15px;
   cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  header, main {
+    width: 95%;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  
+  #composition {
+    padding: 10px;
+  }
+  
+  .tile {
+    height: 200px;
+  }
+  
+  .tile img {
+    height: 200px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
