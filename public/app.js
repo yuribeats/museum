@@ -66,7 +66,7 @@
     }, 300);
   }
 
-  document.addEventListener('keydown', function(e) {
+  window.addEventListener('keydown', function(e) {
     if (e.key === ' ' || e.key === 'Spacebar') {
       e.preventDefault();
       loadNewComposition();
@@ -167,7 +167,6 @@
     }).then(function(canvas) {
       var dataUrl = canvas.toDataURL('image/png');
       
-      // Upload to gallery
       fetch('/api/gallery', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -178,22 +177,18 @@
         console.error('Failed to save to gallery', err);
       });
       
-      // Download handling
       if (isMobile()) {
-        // For iOS/mobile: open image in new tab for long-press save
         var newTab = window.open();
         if (newTab) {
           newTab.document.write('<html><head><title>Save Image</title><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#fff;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;"><p style="position:fixed;bottom:20px;left:0;right:0;text-align:center;font-family:Arial;color:#666;">Long press image to save</p></body></html>');
           newTab.document.close();
         } else {
-          // Fallback: create blob URL and try to open
           canvas.toBlob(function(blob) {
             var url = URL.createObjectURL(blob);
             window.open(url, '_blank');
           }, 'image/png');
         }
       } else {
-        // Desktop: direct download
         var link = document.createElement('a');
         link.download = 'public-' + Date.now() + '.png';
         link.href = dataUrl;
@@ -205,7 +200,6 @@
   headerText.style.cursor = 'pointer';
   headerText.onclick = takeScreenshot;
   
-  // Touch support for mobile
   headerText.addEventListener('touchend', function(e) {
     e.preventDefault();
     takeScreenshot();
