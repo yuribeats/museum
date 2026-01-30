@@ -111,8 +111,8 @@
     });
 
   var gallery = document.getElementById('gallery');
-  var FIXED_WIDTH = 750;
-  var FIXED_HEIGHT = 300;
+  var FIXED_WIDTH = 675;
+  var FIXED_HEIGHT = 270;
 
   function takeScreenshot() {
     if (typeof html2canvas === 'undefined') return;
