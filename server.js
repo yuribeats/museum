@@ -82,7 +82,7 @@ async function getGalleryFromPinata() {
     console.log('Pinata rows:', data.rows ? data.rows.length : 0);
     
     const images = (data.rows || [])
-      .filter(row => row.metadata && row.metadata.name && row.metadata.name.startsWith('pub8-'))
+      .filter(row => row.metadata && row.metadata.name && row.metadata.name.startsWith('pub9-'))
       .map(row => ({
         name: row.metadata.name,
         url: 'https://gateway.pinata.cloud/ipfs/' + row.ipfs_pin_hash,
@@ -161,7 +161,7 @@ app.post('/api/gallery', async (req, res) => {
       return res.status(400).json({ error: 'Invalid image data' });
     }
     const base64Data = image.replace(/^data:image\/png;base64,/, '');
-    const filename = 'pub8-' + Date.now() + '.png';
+    const filename = 'pub9-' + Date.now() + '.png';
     const result = await pinToPinata(base64Data, filename);
     
     if (result.IpfsHash) {
