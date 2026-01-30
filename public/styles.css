@@ -31,6 +31,11 @@ main {
   padding: 0 clamp(16px, 4vw, 48px) 20px;
 }
 
+#composition {
+  border: 1px solid #000;
+  padding: 15px;
+}
+
 #gallery {
   display: flex;
   flex-direction: column;
@@ -43,7 +48,6 @@ main {
   height: 400px;
   overflow: hidden;
   background: #ffffff;
-  border: 1px solid #000;
 }
 
 .tile img {

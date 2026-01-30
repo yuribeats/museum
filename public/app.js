@@ -8,11 +8,11 @@
   var seenImages = JSON.parse(localStorage.getItem('seenImages') || '[]');
   var seenFortunes = JSON.parse(localStorage.getItem('seenFortunes') || '[]');
 
-  var header = document.querySelector('header');
-  var headerSvg = header.querySelector('svg');
-  var headerText = headerSvg.querySelector('text');
-  headerText.setAttribute('stroke', '#000');
-  headerText.setAttribute('stroke-width', '0.5');
+  var headerText = document.getElementById('header-text');
+  var headerSvg = headerText.querySelector('svg');
+  var headerTextEl = headerSvg.querySelector('text');
+  headerTextEl.setAttribute('stroke', '#000');
+  headerTextEl.setAttribute('stroke-width', '0.5');
   headerSvg.style.opacity = '0';
   headerSvg.style.transform = 'translateY(-8px)';
   headerSvg.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
@@ -112,6 +112,7 @@
 
   var gallery = document.getElementById('gallery');
   var FIXED_WIDTH = 600;
+  var FIXED_HEIGHT = 400;
 
   function takeScreenshot() {
     if (typeof html2canvas === 'undefined') return;
@@ -129,25 +130,21 @@
       }, 100);
     });
     
-    // Create fixed-width container for screenshot
     var container = document.createElement('div');
-    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + FIXED_WIDTH + 'px;background:#fff;padding:20px;border:1px solid #000;';
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + FIXED_WIDTH + 'px;background:#fff;padding:15px;border:1px solid #000;';
     
-    // Header
     var headerDiv = document.createElement('div');
     headerDiv.innerHTML = '<svg viewBox="0 0 100 22" preserveAspectRatio="none" style="width:100%;height:auto;display:block;"><text x="0" y="19" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#000" stroke="#000" stroke-width="0.5" textLength="100" lengthAdjust="spacingAndGlyphs">PUBLIC</text></svg>';
     container.appendChild(headerDiv);
     
-    // Image
     var imgDiv = document.createElement('div');
-    imgDiv.style.cssText = 'margin-top:15px;border:1px solid #000;';
+    imgDiv.style.cssText = 'margin-top:15px;width:100%;height:' + FIXED_HEIGHT + 'px;overflow:hidden;';
     var imgEl = document.createElement('img');
     imgEl.src = currentImageSrc;
-    imgEl.style.cssText = 'width:100%;height:auto;display:block;';
+    imgEl.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:center;display:block;';
     imgDiv.appendChild(imgEl);
     container.appendChild(imgDiv);
     
-    // Fortune
     var fortuneDiv = document.createElement('div');
     fortuneDiv.style.cssText = 'margin-top:15px;';
     fortuneDiv.innerHTML = '<svg viewBox="0 0 100 22" preserveAspectRatio="none" style="width:100%;height:auto;display:block;"><text x="0" y="19" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#000" stroke="#000" stroke-width="0.5" textLength="100" lengthAdjust="spacingAndGlyphs">' + currentFortuneText + '</text></svg>';
@@ -155,7 +152,6 @@
     
     document.body.appendChild(container);
     
-    // Wait for image to load in clone
     imgEl.onload = function() {
       html2canvas(container, {
         backgroundColor: '#ffffff',
@@ -181,14 +177,13 @@
       });
     };
     
-    // If image already cached
     if (imgEl.complete) {
       imgEl.onload();
     }
   }
 
-  header.style.cursor = 'pointer';
-  header.onclick = takeScreenshot;
+  headerText.style.cursor = 'pointer';
+  headerText.onclick = takeScreenshot;
 
   fetch('/images.json')
     .then(function(res) { return res.json(); })
