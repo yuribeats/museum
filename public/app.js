@@ -8,11 +8,11 @@
   var seenImages = JSON.parse(localStorage.getItem('seenImages') || '[]');
   var seenFortunes = JSON.parse(localStorage.getItem('seenFortunes') || '[]');
 
-  var header = document.querySelector('header');
-  var headerSvg = header.querySelector('svg');
-  var headerText = headerSvg.querySelector('text');
-  headerText.setAttribute('stroke', '#000');
-  headerText.setAttribute('stroke-width', '0.5');
+  var headerText = document.getElementById('header-text');
+  var headerSvg = headerText.querySelector('svg');
+  var headerTextEl = headerSvg.querySelector('text');
+  headerTextEl.setAttribute('stroke', '#000');
+  headerTextEl.setAttribute('stroke-width', '0.5');
   headerSvg.style.opacity = '0';
   headerSvg.style.transform = 'translateY(-8px)';
   headerSvg.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
@@ -123,32 +123,18 @@
         }, 100);
       }, 100);
     });
-    var main = document.querySelector('main');
-    html2canvas(document.body, {
+    
+    var composition = document.getElementById('composition');
+    var originalWidth = composition.style.width;
+    composition.style.width = '600px';
+    
+    html2canvas(composition, {
       backgroundColor: '#ffffff',
-      scale: 2
+      scale: 2,
+      width: 600
     }).then(function(canvas) {
-      var headerEl = document.querySelector('header');
-      var fortuneEl = document.getElementById('fortune');
-      var contentTop = headerEl.offsetTop;
-      var contentBottom = fortuneEl.offsetTop + fortuneEl.offsetHeight;
-      var contentHeight = contentBottom - contentTop;
-      var contentWidth = main.offsetWidth;
-      var size = Math.max(contentWidth, contentHeight) * 2;
-      var squareCanvas = document.createElement('canvas');
-      squareCanvas.width = size;
-      squareCanvas.height = size;
-      var ctx = squareCanvas.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, size, size);
-      var sourceWidth = contentWidth * 2;
-      var sourceHeight = contentHeight * 2;
-      var sourceX = (canvas.width - sourceWidth) / 2;
-      var sourceY = contentTop * 2;
-      var destX = (size - sourceWidth) / 2;
-      var destY = (size - sourceHeight) / 2;
-      ctx.drawImage(canvas, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, sourceWidth, sourceHeight);
-      var dataUrl = squareCanvas.toDataURL();
+      composition.style.width = originalWidth;
+      var dataUrl = canvas.toDataURL();
       
       fetch('https://api.museum.ink/api/gallery', {
         method: 'POST',
@@ -167,8 +153,7 @@
     });
   }
 
-  header.style.cursor = 'pointer';
-  header.onclick = takeScreenshot;
+  headerText.onclick = takeScreenshot;
 
   fetch('/images.json')
     .then(function(res) { return res.json(); })
