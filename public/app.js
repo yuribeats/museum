@@ -112,7 +112,7 @@
 
   var gallery = document.getElementById('gallery');
   var FIXED_WIDTH = 600;
-  var FIXED_HEIGHT = 400;
+  var FIXED_HEIGHT = 500;
 
   function takeScreenshot() {
     if (typeof html2canvas === 'undefined') return;
