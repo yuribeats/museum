@@ -47,7 +47,7 @@
     }
   }
 
-  function loadNewComposition() {
+  window.loadNewComposition = function() {
     if (img) {
       img.style.opacity = '0';
       img.style.transform = 'scale(0.98)';
@@ -64,15 +64,6 @@
     setTimeout(function() {
       location.reload();
     }, 300);
-  }
-
-  document.onkeydown = function(e) {
-    if (e.keyCode === 32 || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault();
-      e.stopPropagation();
-      loadNewComposition();
-      return false;
-    }
   };
 
   fetch('/fortunes.txt')
@@ -241,7 +232,7 @@
         checkAllLoaded();
       };
       tile.onclick = function() {
-        loadNewComposition();
+        window.loadNewComposition();
       };
       img.onerror = function() {
         tile.classList.add('error');
@@ -250,3 +241,14 @@
       gallery.appendChild(tile);
     });
 })();
+
+// Spacebar handler outside IIFE
+document.onkeydown = function(e) {
+  if (e.keyCode === 32 || e.key === ' ') {
+    e.preventDefault();
+    if (window.loadNewComposition) {
+      window.loadNewComposition();
+    }
+    return false;
+  }
+};
