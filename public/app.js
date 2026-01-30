@@ -19,8 +19,6 @@
 
   var fortuneSvg = null;
   var img = null;
-  var currentImageSrc = null;
-  var currentFortuneText = null;
 
   function fadeInAll() {
     headerSvg.style.opacity = '1';
@@ -77,7 +75,6 @@
         lines.push(line);
       }
       var lastLine = lines[lines.length - 1];
-      currentFortuneText = lastLine;
       fortuneSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       fortuneSvg.setAttribute('viewBox', '0 0 100 22');
       fortuneSvg.setAttribute('preserveAspectRatio', 'none');
@@ -128,66 +125,29 @@
       }, 100);
     });
     
-    var SIZE = 600;
-    var PADDING = 15;
-    var HEADER_HEIGHT = 50;
-    var FORTUNE_HEIGHT = 50;
-    var GAP = 15;
-    var IMAGE_HEIGHT = SIZE - PADDING * 2 - HEADER_HEIGHT - FORTUNE_HEIGHT - GAP * 2;
+    var composition = document.getElementById('composition');
     
-    var container = document.createElement('div');
-    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + SIZE + 'px;height:' + SIZE + 'px;background:#fff;padding:' + PADDING + 'px;border:1px solid #000;box-sizing:border-box;';
-    
-    var headerDiv = document.createElement('div');
-    headerDiv.style.cssText = 'height:' + HEADER_HEIGHT + 'px;display:flex;align-items:center;';
-    headerDiv.innerHTML = '<svg viewBox="0 0 100 22" preserveAspectRatio="none" style="width:100%;height:auto;display:block;"><text x="0" y="19" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#000" stroke="#000" stroke-width="0.5" textLength="100" lengthAdjust="spacingAndGlyphs">PUBLIC</text></svg>';
-    container.appendChild(headerDiv);
-    
-    var imgDiv = document.createElement('div');
-    imgDiv.style.cssText = 'margin-top:' + GAP + 'px;width:100%;height:' + IMAGE_HEIGHT + 'px;overflow:hidden;';
-    var imgEl = document.createElement('img');
-    imgEl.src = currentImageSrc;
-    imgEl.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:center;display:block;';
-    imgDiv.appendChild(imgEl);
-    container.appendChild(imgDiv);
-    
-    var fortuneDiv = document.createElement('div');
-    fortuneDiv.style.cssText = 'margin-top:' + GAP + 'px;height:' + FORTUNE_HEIGHT + 'px;display:flex;align-items:center;';
-    fortuneDiv.innerHTML = '<svg viewBox="0 0 100 22" preserveAspectRatio="none" style="width:100%;height:auto;display:block;"><text x="0" y="19" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#000" stroke="#000" stroke-width="0.5" textLength="100" lengthAdjust="spacingAndGlyphs">' + currentFortuneText + '</text></svg>';
-    container.appendChild(fortuneDiv);
-    
-    document.body.appendChild(container);
-    
-    imgEl.onload = function() {
-      html2canvas(container, {
-        backgroundColor: '#ffffff',
-        scale: 2,
-        width: SIZE,
-        height: SIZE
-      }).then(function(canvas) {
-        document.body.removeChild(container);
-        var dataUrl = canvas.toDataURL();
-        
-        fetch('/api/gallery', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: dataUrl })
-        }).then(function(res) { return res.json(); }).then(function(data) {
-          console.log('Saved to gallery:', data.url);
-        }).catch(function(err) {
-          console.error('Failed to save to gallery', err);
-        });
-        
-        var link = document.createElement('a');
-        link.download = 'public-' + Date.now() + '.png';
-        link.href = dataUrl;
-        link.click();
+    html2canvas(composition, {
+      backgroundColor: '#ffffff',
+      scale: 2
+    }).then(function(canvas) {
+      var dataUrl = canvas.toDataURL();
+      
+      fetch('/api/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: dataUrl })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        console.log('Saved to gallery:', data.url);
+      }).catch(function(err) {
+        console.error('Failed to save to gallery', err);
       });
-    };
-    
-    if (imgEl.complete) {
-      imgEl.onload();
-    }
+      
+      var link = document.createElement('a');
+      link.download = 'public-' + Date.now() + '.png';
+      link.href = dataUrl;
+      link.click();
+    });
   }
 
   headerText.style.cursor = 'pointer';
@@ -217,7 +177,6 @@
       tile.style.overflow = 'hidden';
       img = document.createElement('img');
       img.src = imageData.url;
-      currentImageSrc = imageData.url;
       img.alt = imageData.name || '';
       img.style.opacity = '0';
       img.style.transform = 'scale(0.96)';
