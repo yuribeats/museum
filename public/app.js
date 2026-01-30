@@ -111,8 +111,6 @@
     });
 
   var gallery = document.getElementById('gallery');
-  var FIXED_WIDTH = 675;
-  var FIXED_HEIGHT = 270;
 
   function takeScreenshot() {
     if (typeof html2canvas === 'undefined') return;
@@ -130,15 +128,23 @@
       }, 100);
     });
     
+    var SIZE = 600;
+    var PADDING = 15;
+    var HEADER_HEIGHT = 50;
+    var FORTUNE_HEIGHT = 50;
+    var GAP = 15;
+    var IMAGE_HEIGHT = SIZE - PADDING * 2 - HEADER_HEIGHT - FORTUNE_HEIGHT - GAP * 2;
+    
     var container = document.createElement('div');
-    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + FIXED_WIDTH + 'px;background:#fff;padding:15px;border:1px solid #000;';
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + SIZE + 'px;height:' + SIZE + 'px;background:#fff;padding:' + PADDING + 'px;border:1px solid #000;box-sizing:border-box;';
     
     var headerDiv = document.createElement('div');
+    headerDiv.style.cssText = 'height:' + HEADER_HEIGHT + 'px;display:flex;align-items:center;';
     headerDiv.innerHTML = '<svg viewBox="0 0 100 22" preserveAspectRatio="none" style="width:100%;height:auto;display:block;"><text x="0" y="19" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#000" stroke="#000" stroke-width="0.5" textLength="100" lengthAdjust="spacingAndGlyphs">PUBLIC</text></svg>';
     container.appendChild(headerDiv);
     
     var imgDiv = document.createElement('div');
-    imgDiv.style.cssText = 'margin-top:15px;width:100%;height:' + FIXED_HEIGHT + 'px;overflow:hidden;';
+    imgDiv.style.cssText = 'margin-top:' + GAP + 'px;width:100%;height:' + IMAGE_HEIGHT + 'px;overflow:hidden;';
     var imgEl = document.createElement('img');
     imgEl.src = currentImageSrc;
     imgEl.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:center;display:block;';
@@ -146,7 +152,7 @@
     container.appendChild(imgDiv);
     
     var fortuneDiv = document.createElement('div');
-    fortuneDiv.style.cssText = 'margin-top:15px;';
+    fortuneDiv.style.cssText = 'margin-top:' + GAP + 'px;height:' + FORTUNE_HEIGHT + 'px;display:flex;align-items:center;';
     fortuneDiv.innerHTML = '<svg viewBox="0 0 100 22" preserveAspectRatio="none" style="width:100%;height:auto;display:block;"><text x="0" y="19" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="22" fill="#000" stroke="#000" stroke-width="0.5" textLength="100" lengthAdjust="spacingAndGlyphs">' + currentFortuneText + '</text></svg>';
     container.appendChild(fortuneDiv);
     
@@ -155,7 +161,9 @@
     imgEl.onload = function() {
       html2canvas(container, {
         backgroundColor: '#ffffff',
-        scale: 2
+        scale: 2,
+        width: SIZE,
+        height: SIZE
       }).then(function(canvas) {
         document.body.removeChild(container);
         var dataUrl = canvas.toDataURL();
