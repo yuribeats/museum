@@ -169,11 +169,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: dataUrl })
-      }).then(function(res) { return res.json(); }).then(function(data) {
-        console.log('Saved to gallery:', data.url);
-      }).catch(function(err) {
-        console.error('Failed to save to gallery', err);
-      });
+      }).then(function(res) { return res.json(); }).catch(function() {});
       
       // Download - works on all devices including iOS
       var link = document.createElement('a');
@@ -185,7 +181,6 @@
     });
   }
 
-  headerText.style.cursor = 'pointer';
   headerText.onclick = takeScreenshot;
   
   headerText.addEventListener('touchend', function(e) {
@@ -213,7 +208,6 @@
       localStorage.setItem('seenImages', JSON.stringify(seenImages));
       var tile = document.createElement('div');
       tile.className = 'tile';
-      tile.style.cursor = 'pointer';
       tile.style.overflow = 'hidden';
       img = document.createElement('img');
       img.src = imageData.url;

@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 8080;
 const IMAGES_DIR = path.join(__dirname, 'public', 'images');
 const ALLOWED_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
 
-const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIwMzMzMzdmOC0wNTEwLTQ4NTQtYmVjYi1iMGRlNGFlNmExMzAiLCJlbWFpbCI6IncueXVyaS5yeWJha0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiZTQ1ZTVmYjUzZGQ0Nzc4MzAyMmMiLCJzY29wZWRLZXlTZWNyZXQiOiJmNzQwNDU4ZDk5MTlmMWQ4YTY2OWIzZGRkZTA3MzZlMTBiYmVlNmM2NDhiODVhMDAyYmU2NDY1YjFmNzcwNWMxIiwiZXhwIjoxODAxMjU3MjI0fQ.4pEiKLAZ3leXirocAE0D7g6XrxlnhWUcCyhs745WLmQ';
+const PINATA_JWT = process.env.PINATA_JWT;
 
 let cache = { images: [], timestamp: 0 };
 const CACHE_TTL = 2000;
@@ -72,15 +72,12 @@ async function getGalleryFromPinata() {
     return galleryCache.images;
   }
   try {
-    console.log('Fetching gallery from Pinata...');
     const response = await axios.get('https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=1000', {
       headers: {
         'Authorization': 'Bearer ' + PINATA_JWT
       }
     });
     const data = response.data;
-    console.log('Pinata rows:', data.rows ? data.rows.length : 0);
-    
     const images = (data.rows || [])
       .filter(row => row.metadata && row.metadata.name && row.metadata.name.startsWith('pub14-'))
       .map(row => ({
@@ -90,7 +87,6 @@ async function getGalleryFromPinata() {
       }))
       .sort((a, b) => b.mtime - a.mtime);
     
-    console.log('Found gallery images:', images.length);
     galleryCache.images = images;
     galleryCache.timestamp = now;
     return images;
@@ -112,8 +108,6 @@ async function pinToPinata(base64Data, filename) {
   form.append('pinataMetadata', JSON.stringify({ name: filename }));
   form.append('pinataOptions', JSON.stringify({ cidVersion: 0 }));
   
-  console.log('Uploading to Pinata:', filename, 'size:', buffer.length);
-  
   try {
     const response = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', form, {
       maxBodyLength: Infinity,
@@ -122,7 +116,6 @@ async function pinToPinata(base64Data, filename) {
         ...form.getHeaders()
       }
     });
-    console.log('Pinata response:', JSON.stringify(response.data));
     return response.data;
   } catch (e) {
     console.error('Pinata axios error:', e.response ? e.response.data : e.message);
@@ -157,7 +150,6 @@ app.post('/api/gallery', async (req, res) => {
   try {
     const { image } = req.body;
     if (!image || !image.startsWith('data:image/png;base64,')) {
-      console.log('Invalid image data received');
       return res.status(400).json({ error: 'Invalid image data' });
     }
     const base64Data = image.replace(/^data:image\/png;base64,/, '');
@@ -165,7 +157,6 @@ app.post('/api/gallery', async (req, res) => {
     const result = await pinToPinata(base64Data, filename);
     
     if (result.IpfsHash) {
-      console.log('Successfully pinned:', result.IpfsHash);
       galleryCache.timestamp = 0;
       res.json({ success: true, url: 'https://gateway.pinata.cloud/ipfs/' + result.IpfsHash });
     } else {
@@ -182,6 +173,4 @@ app.get('/health', (req, res) => res.send('OK'));
 
 app.use((req, res) => res.status(404).send('Not found'));
 
-app.listen(PORT, '0.0.0.0', () => console.log('Server running on port ' + PORT));
-// Thu Jan 29 22:52:49 EST 2026
-// Thu Jan 29 22:52:55 EST 2026
+app.listen(PORT, '0.0.0.0');
